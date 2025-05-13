@@ -1,5 +1,5 @@
 import { Container, Row, Col } from 'react-bootstrap';
-import { FaMapMarkerAlt, FaEnvelope, FaWhatsapp, FaFacebookF, FaTwitter, FaInstagram, FaChevronRight, FaClock } from 'react-icons/fa';
+import { FaWhatsapp, FaFacebookF, FaTwitter, FaInstagram, FaChevronRight, FaClock } from 'react-icons/fa';
 import Map from '../map/map';
 import './LayoutFooter.css'
 const Footer = () => {

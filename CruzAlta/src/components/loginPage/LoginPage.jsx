@@ -24,7 +24,7 @@ const LoginPage = () => {
       setMessage('Usuario o contraseña incorrectos');
     }
   };
-
+  const handleForgetPasswordClick = () => navigate('/forgot-password');
   return (
     <div className="login-container d-flex align-items-center justify-content-center min-vh-100">
       <div className="login-box w-100" style={{ maxWidth: '400px' }}>
@@ -53,7 +53,7 @@ const LoginPage = () => {
               required
             />
             <div className="text-end mt-1">
-              <a href="#" className="text-decoration-none small">¿Olvidaste la contraseña?</a>
+              <a href="" className="text-decoration-none small " onClick={handleForgetPasswordClick} >¿Olvidaste la contraseña?</a>
             </div>
           </Form.Group>
 

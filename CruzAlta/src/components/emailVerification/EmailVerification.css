@@ -1,0 +1,20 @@
+.colorbutton {
+  background-color: #440E0E;
+  color: white;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.colorbutton:hover {
+  background-color: white;
+  color: #440E0E;
+  border: 1px solid #440E0E;
+}
+
+.disabled-custom {
+  background-color: white !important;
+  color: #440E0E !important;
+  border: 1px solid #440E0E !important;
+  pointer-events: none;
+  cursor: not-allowed;
+}

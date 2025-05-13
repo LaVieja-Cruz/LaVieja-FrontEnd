@@ -7,6 +7,8 @@ import Layout from './components/layout/Layout';
 import MainPage from './components/mainPage/MainPage';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
+import ForgotPassword from './components/password/Password';
+import EmailVerification from './components/emailVerification/EmailVerification';
 
 
 function App() {
@@ -22,7 +24,13 @@ function App() {
     {
       path: '/login',
       element: <LoginPage />
-    }
+    },
+    {path: "/forgot-password",
+    element: <ForgotPassword/>
+      },
+       {path: "/email-verification",
+    element: <EmailVerification/>
+      }
   ]);
 
   return <RouterProvider router={router} />;
