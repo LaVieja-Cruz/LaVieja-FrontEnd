@@ -6,8 +6,6 @@ import { useAuth } from '../../context/AuthContext';
 import { authenticateUser } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 
-
-
 const LoginPage = () => {
   const { login } = useAuth();
   const [email, setEmail] = useState('');
@@ -27,50 +25,40 @@ const LoginPage = () => {
     }
   };
 
-  const navigateToRegister = () => {
-    navigate('/register');
-  };
-
   return (
-    <div className="login-container">
-      <div className="login-form-container">
-        <div className="logo-container">
-          <img src="/logo.png" alt="Logo" className="logo-image" />
-        </div>
-
-        <div className="login-toggle">
-          <Button variant="dark" className="login-toggle-button">Iniciar Sesión</Button>
-          <Button variant="success" onClick={navigateToRegister} className="login-toggle-button text-white">Registrarme</Button>
-        </div>
+    <div className="login-container d-flex align-items-center justify-content-center min-vh-100">
+      <div className="login-box w-100" style={{ maxWidth: '400px' }}>
+        <h2 className="fw-bold mb-1">Acceda a su cuenta.</h2>
+        <p className="text-muted mb-4">Por favor acceda a su cuenta</p>
 
         <Form onSubmit={handleSubmit}>
-          <Form.Group className="mb-3" controlId="formBasicEmail">
+          <Form.Group className="mb-3">
             <Form.Label>Correo electrónico</Form.Label>
-            <Form.Control 
-              type="email" 
-              placeholder="Ingresa tu correo" 
+            <Form.Control
+              type="email"
+              placeholder="tuemail@ejemplo.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required 
+              required
             />
           </Form.Group>
 
-          <Form.Group className="mb-2" controlId="formBasicPassword">
+          <Form.Group className="mb-2 position-relative">
             <Form.Label>Contraseña</Form.Label>
-            <Form.Control 
-              type="password" 
-              placeholder="Contraseña" 
+            <Form.Control
+              type="password"
+              placeholder="********"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required 
+              required
             />
-            <div className="forgot-password">
-              <a href="#">¿Olvidó contraseña?</a>
+            <div className="text-end mt-1">
+              <a href="#" className="text-decoration-none small">¿Olvidaste la contraseña?</a>
             </div>
           </Form.Group>
 
-          <Button variant="dark" type="submit" className="w-100 mt-3">
-            Iniciar Sesión
+          <Button type="submit" className="btn btn-danger w-100 rounded-pill mt-3">
+            Iniciar sesión
           </Button>
         </Form>
 
@@ -80,8 +68,20 @@ const LoginPage = () => {
           </div>
         )}
 
-        <div className="register-prompt">
-          <small>¿No tienes una cuenta? <a href="#" onClick={navigateToRegister}>Regístrate</a></small>
+        <div className="d-flex align-items-center my-4">
+          <hr className="flex-grow-1" />
+          <span className="mx-2 text-muted">O conéctese con</span>
+          <hr className="flex-grow-1" />
+        </div>
+
+        <div className="d-flex justify-content-center gap-3 mb-4">
+          <img src="PATH_TO_GOOGLE_ICON" alt="Google" className="social-icon" />
+          <img src="PATH_TO_FACEBOOK_ICON" alt="Facebook" className="social-icon" />
+          <img src="PATH_TO_APPLE_ICON" alt="Apple" className="social-icon" />
+        </div>
+
+        <div className="text-center">
+          <small>¿No tienes cuenta? <a href="#" onClick={() => navigate('/register')}>Registrarse</a></small>
         </div>
       </div>
     </div>

@@ -1,53 +1,24 @@
 .login-container {
-  min-height: 100vh;
-  background-image: url("/public/images/background1.jpg");
-  background-size: cover;
-  background-position: center;  
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  padding: 1rem;
+  background-color: #f8f9fa;
 }
 
-.login-form-container {
-  background: rgba(255, 255, 255, 0.9);
-  width: 100%;
-  max-width: 400px;
-  padding: 1.5rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+.login-box {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.logo-container {
-  text-align: center;
-  margin-bottom: 1rem;
+.social-icon {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+  transition: transform 0.2s ease;
 }
 
-.logo-image {
-  height: 60px;
-}
-
-.login-toggle {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-  border-radius: 50px;
-  overflow: hidden;
-  border: 1px solid #dee2e6;
-  background-color: #e9ecef;
-}
-
-.login-toggle-button {
-  border-radius: 0;
-  width: 50%;
-}
-
-.forgot-password {
-  text-align: right;
-  margin-top: 0.25rem;
-  font-size: 0.9rem;
-}
-
-.register-prompt {
-  text-align: center;
-  margin-top: 1rem;
+.social-icon:hover {
+  transform: scale(1.1);
 }
