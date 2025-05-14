@@ -11,6 +11,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import ForgotPassword from './components/password/Password';
 import EmailVerification from './components/emailVerification/EmailVerification';
 import ChangePassword from './components/changePassword/ChangePassword';
+import PresentationPage from './components/presentationPage/PresentationPage';
 
 function App() {
   const router = createBrowserRouter([
@@ -18,13 +19,27 @@ function App() {
       path: "/",
       element: (
         <Layout>
-          <MainPage />
+          <PresentationPage />
         </Layout>
       )
     },
     {
       path: '/login',
-      element: <LoginPage />
+      element: 
+      (
+        <Layout>
+          <LoginPage/>
+        </Layout>
+      )
+    },
+    {
+      path: '/main',
+      element: 
+      (
+        <Layout>
+          <MainPage/>
+        </Layout>
+      )
     },
     {path: "/forgot-password",
     element: <ForgotPassword/>

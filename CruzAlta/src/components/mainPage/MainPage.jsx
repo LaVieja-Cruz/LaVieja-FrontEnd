@@ -8,21 +8,17 @@ import {
   Button,
   Card,
 } from "react-bootstrap";
-import LayoutNav from "../layoutNav/LayoutNav";
-import HeroBanner from "../heroBanner/HeroBanner";
-import ExperienceSection from "../experienceSection/ExperienceSection";
-import AboutSection from "../aboutUs/AboutUs";
-import Footer from "../layoutFooter/LayoutFooter";
-import DayBanner from "../dayBanner/DayBanner";
+
+import LoginPage from "../loginPage/LoginPage";
 const MainPage = () => {
-  return (
-    <div className="d-flex flex-column min-vh-100">
-      <main className="flex-grow-1">
-        <HeroBanner />
-        <AboutSection />
-        <DayBanner/>
-        <ExperienceSection />
-      </main>
+  return(
+    <div className="d-flex justify-content-center align-items-center vh-100">
+      <Card 
+        style={{ width: '600px', height: '600px' }} 
+        className="border-0 d-flex justify-content-center align-items-center">
+   
+        <img src="/images/logo.svg" alt="logo" style={{ maxWidth: '100%', maxHeight: '100%' }} />
+      </Card>
     </div>
   );
 };

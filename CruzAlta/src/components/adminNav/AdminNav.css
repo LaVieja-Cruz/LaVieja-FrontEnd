@@ -1,0 +1,5 @@
+.nav-link:hover {
+  font-weight: bold;
+  transform: scale(1.05);
+  color: #440E0E;
+}

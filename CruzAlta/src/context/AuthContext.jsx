@@ -10,17 +10,30 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [watchId, setWatchId] = useState(null);
+  const [role, setRole] = useState(null);
+
 
   useEffect(() => {
-    const token = localStorage.getItem('jwtToken');
-    if (token) {
-      setIsLoggedIn(true);
+  const token = localStorage.getItem('jwtToken');
+  if (token) {
+    try {
       const decoded = jwtDecode(token);
-      if (decoded.role === "3") {
-        startTracking(decoded.sub, token); // sub = idUsuario
+     
+      setIsLoggedIn(true);
+
+      // Accede a la propiedad `role` usando la ruta correcta
+      const role = decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+      if (role) {
+        setRole(role);  // Guarda el Rol en el estado
+      } else {
+        console.error("El token no contiene la propiedad 'role'.");
       }
+    } catch (error) {
+      console.error("Error decodificando el token:", error);
     }
-  }, []);
+  }
+}, []);
+
 
   const startTracking = (idUsuario, token) => {
     if (!navigator.geolocation) return;
@@ -65,23 +78,26 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = (token) => {
-    localStorage.setItem('jwtToken', token);
-    setIsLoggedIn(true);
+  localStorage.setItem('jwtToken', token);
+  setIsLoggedIn(true);
 
-    const decoded = jwtDecode(token);
-    if (decoded.role === "3") {
-      startTracking(decoded.sub, token); // Delivery
-    }
-  };
+  const decoded = jwtDecode(token);
+
+  // Accede al role correctamente
+  const role = decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+  setRole(role);
+};
+
 
   const logout = () => {
     stopTracking();
     localStorage.removeItem('jwtToken');
     setIsLoggedIn(false);
+    setRole(null);
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, login, logout, role }}>
       {children}
     </AuthContext.Provider>
   );
