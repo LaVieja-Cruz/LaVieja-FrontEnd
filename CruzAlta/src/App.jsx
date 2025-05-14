@@ -2,7 +2,8 @@
 import './App.css';
 import LoginPage from './components/loginPage/LoginPage'; // Ajusta la ruta si es distinta
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-
+import AdminMapPage from './components/AdminMap/AdminMapPage';     
+import DeliveryPedidosPage from './components/deliveryPedidos/DeliveryPedidosPage';
 import Layout from './components/layout/Layout';
 import MainPage from './components/mainPage/MainPage';
 
@@ -33,7 +34,23 @@ function App() {
       },
        {path: "/change-password",
     element: <ChangePassword/>
-      }
+      },
+      {
+        path: "/delivery/pedidos",
+        element: (
+          <Layout>
+            <DeliveryPedidosPage />
+          </Layout>
+        )
+      },
+      {
+      path: "/admin/mapa",
+      element: (
+        <Layout>
+          <AdminMapPage />
+        </Layout>
+      )
+    }
   ]);
 
   return <RouterProvider router={router} />;

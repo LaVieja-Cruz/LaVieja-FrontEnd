@@ -1,6 +1,17 @@
 import { Navbar, Container, Nav, Button } from "react-bootstrap";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+
+let decodedJwt = null;
+const token = localStorage.getItem("jwtToken");
+if (token) {
+  try {
+    decodedJwt = jwtDecode(token);
+  } catch (error) {
+    console.error("Token inválido:", error);
+  }
+}
 
 const LayoutNav = () => {
   const { isLoggedIn, logout } = useAuth();
@@ -23,6 +34,14 @@ const LayoutNav = () => {
             <Nav.Link href="#camping" className="colortxt fw-bold">DECK</Nav.Link>
             <Nav.Link href="#descubre" className="colortxt fw-bold">CAMPING</Nav.Link>
             <Nav.Link href="#descubre" className="colortxt fw-bold">RECORRIDO</Nav.Link>
+            {isLoggedIn && decodedJwt?.role === "3" && (
+            <Nav.Link href="/delivery/pedidos">Mis Pedidos</Nav.Link>
+            )}
+
+            {isLoggedIn && (
+            <Nav.Link href="/admin/mapa" className="colortxt fw-bold">Mapa Deliverys</Nav.Link>
+            )}
+
             {!isLoggedIn ? (
               <Button  className="ms-3 txtcolor colorbutton" onClick={handleLoginClick}>
                 Iniciar sesión
