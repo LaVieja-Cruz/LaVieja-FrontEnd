@@ -22,7 +22,7 @@ const LoginPage = () => {
       const { token } = await authenticateUser(email, password);
       login(token);
       setMessage('Inicio de sesión exitoso');
-      navigate('/', { state: { loginSuccess: true } });
+      navigate('/main', { state: { loginSuccess: true } });
     } catch (error) {
       setMessage('Usuario o contraseña incorrectos');
     }
