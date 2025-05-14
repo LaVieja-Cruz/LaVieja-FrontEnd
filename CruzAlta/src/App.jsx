@@ -12,6 +12,7 @@ import ForgotPassword from './components/password/Password';
 import EmailVerification from './components/emailVerification/EmailVerification';
 import ChangePassword from './components/changePassword/ChangePassword';
 import PresentationPage from './components/presentationPage/PresentationPage';
+import Pedidos from './components/pedidos/Pedidos';
 
 function App() {
   const router = createBrowserRouter([
@@ -50,7 +51,15 @@ function App() {
        {path: "/change-password",
     element: <ChangePassword/>
       },
-      {
+    {path: "admin/pedidos",
+   element: 
+      (
+        <Layout>
+          <Pedidos/>
+        </Layout>
+      )
+      },
+            {
         path: "/delivery/pedidos",
         element: (
           <Layout>
