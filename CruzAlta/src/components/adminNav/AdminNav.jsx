@@ -24,6 +24,9 @@ const AdminNav = () => {
             <Nav.Link className= "colortxt " href="/admin/proovedores">Proovedores</Nav.Link>
             <Nav.Link className= "colortxt " href="/admin/pedidos">Pedidos</Nav.Link>
             <Nav.Link className= "colortxt " href="/admin/mapa">Mapa Delivery</Nav.Link>
+            <Nav.Link className="colortxt" href="/admin/cargar-pedido">Cargar Pedido</Nav.Link>
+            <Nav.Link className="colortxt" href="/admin/ver-pedidos">Ver Pedidos</Nav.Link>
+
             <Button className="ms-3 txtcolor colorbutton" onClick={handleLogoutClick}>
               Cerrar sesión
             </Button>

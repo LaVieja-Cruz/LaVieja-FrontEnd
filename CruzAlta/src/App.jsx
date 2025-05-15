@@ -6,6 +6,10 @@ import AdminMapPage from './components/AdminMap/AdminMapPage';
 import DeliveryPedidosPage from './components/deliveryPedidos/DeliveryPedidosPage';
 import Layout from './components/layout/Layout';
 import MainPage from './components/mainPage/MainPage';
+//aca pegue recien SHARAWI
+import AdminCrearPedido from './components/administrador/AdminCrearPedido';
+import PedidosAdminPage from './components/administrador/PedidosAdminPage';
+
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ForgotPassword from './components/password/Password';
@@ -67,6 +71,23 @@ function App() {
           </Layout>
         )
       },
+      {
+      path: "/admin/cargar-pedido",
+      element: (
+        <Layout>
+          <AdminCrearPedido />
+        </Layout>
+      )
+    },
+    {
+      path: "/admin/ver-pedidos",
+      element: (
+        <Layout>
+          <PedidosAdminPage />
+        </Layout>
+      )
+    },
+
       {
       path: "/admin/mapa",
       element: (

@@ -73,7 +73,7 @@ const Pedidos = () => {
     try {
       const token = localStorage.getItem('jwtToken');
       const resp = await fetch('https://localhost:7042/api/Menus/Create', {
-        method: 'CREATE',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: token ? `Bearer ${token}` : undefined
