@@ -21,9 +21,8 @@ const ItemCard = ({ item, onAgregarAlPedido }) => (
         </strong>
       </div>
       <Button
-        variant="primary"
         size="sm"
-        className="mt-auto"
+        className="mt-auto colorbutton"
         onClick={onAgregarAlPedido}
       >
         Añadir al pedido
