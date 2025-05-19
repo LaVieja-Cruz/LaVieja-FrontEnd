@@ -157,7 +157,7 @@ const Pedidos = () => {
 
   return (
     <Container fluid>
-      <h2 className="my-4 colortxt text-center">Realizar Pedido</h2>
+      <h2 className="my-4 titulo text-center">Realizar Pedido</h2>
       <Row>
         {/* Columna de Menus y Comidas */}
         <Col md={8}>

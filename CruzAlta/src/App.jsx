@@ -13,6 +13,7 @@ import EmailVerification from './components/emailVerification/EmailVerification'
 import ChangePassword from './components/changePassword/ChangePassword';
 import PresentationPage from './components/presentationPage/PresentationPage';
 import Pedidos from './components/pedidos/Pedidos';
+import ResumenCaja from './components/resumenCaja/ResumenCaja';
 
 function App() {
   const router = createBrowserRouter([
@@ -72,6 +73,14 @@ function App() {
       element: (
         <Layout>
           <AdminMapPage />
+        </Layout>
+      )
+    },
+    {
+      path: "/admin/caja",
+      element: (
+        <Layout>
+          <ResumenCaja />
         </Layout>
       )
     }
