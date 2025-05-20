@@ -17,6 +17,11 @@ import ResumenCaja from './components/resumenCaja/ResumenCaja';
 import ProveedoresPage from './components/proveedores/ProveedoresPage';
 import CrearProveedor from './components/proveedores/CrearProveedor';
 import EditarProveedor from './components/proveedores/EditarProveedor';
+import DetalleCaja from './components/resumenCaja/DetalleCaja';
+import ComprasProveedorPage from './components/compras/ComprasProveedorPage';
+import CuentaCorrienteCliente from './components/cuentaCorriente/CuentaCorrienteCliente';
+import CuentaCorrienteAdmin from './components/cuentaCorriente/CuentaCorrienteAdmin';
+
 
 
 
@@ -113,7 +118,41 @@ function App() {
           <EditarProveedor />
         </Layout>
       )
+    },
+    {
+      path: "/admin/caja/detalle",
+      element: (
+        <Layout>
+          <DetalleCaja />
+        </Layout>
+      )
+    },
+    {
+      path: "/admin/compras",
+      element: (
+        <Layout>
+          <ComprasProveedorPage />
+        </Layout>
+      )
+    },
+    {
+      path: "/cuenta-corriente",
+      element: (
+        <Layout>
+          <CuentaCorrienteCliente />
+        </Layout>
+      )
+    },
+    {
+      path: "/admin/cuenta-corriente",
+      element: (
+        <Layout>
+          <CuentaCorrienteAdmin />
+        </Layout>
+      )
     }
+
+
 
   ]);
 
