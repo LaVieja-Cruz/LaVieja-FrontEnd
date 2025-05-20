@@ -11,6 +11,7 @@ import {
 } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useNavigate } from "react-router-dom";
 
 const ResumenCaja = () => {
   const [cajas, setCajas] = useState([]);
@@ -20,6 +21,7 @@ const ResumenCaja = () => {
   const [hasta, setHasta] = useState(new Date());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const apiUrl = "https://localhost:7042/api/Caja";
 
@@ -97,34 +99,68 @@ const ResumenCaja = () => {
 
   useEffect(() => {
     fetchCaja();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filtro, fecha, desde, hasta]);
 
-  const exportarPDF = () => {
-    let url = "";
-    if (filtro === "dia") {
-      const fechaStr = fecha.toISOString().split("T")[0];
-      url = `${apiUrl}/exportar-pdf?fecha=${fechaStr}`;
-    } else if (filtro === "semana") {
-      const fechaHasta = new Date(fecha);
-      const fechaDesde = new Date(fecha);
-      fechaDesde.setDate(fechaDesde.getDate() - 6);
-      const desdeStr = fechaDesde.toISOString();
-      const hastaStr = fechaHasta.toISOString();
-      url = `${apiUrl}/exportar-pdf-semana?desde=${desdeStr}&hasta=${hastaStr}`;
-    } else if (filtro === "mes") {
-      const mes = fecha.toISOString().slice(0, 7);
-      url = `${apiUrl}/exportar-pdf-mes?mes=${mes}`;
-    } else if (filtro === "anio") {
-      const anio = fecha.getFullYear();
-      url = `${apiUrl}/exportar-pdf-anio?anio=${anio}`;
-    } else if (filtro === "rango") {
-      const desdeStr = desde.toISOString();
-      const hastaStr = hasta.toISOString();
-      url = `${apiUrl}/exportar-pdf-semana?desde=${desdeStr}&hasta=${hastaStr}`;
-    }
+  const exportarPDF = async () => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+      const headers = {
+        ...(token && { Authorization: `Bearer ${token}` }),
+      };
 
-    window.open(url, "_blank");
+      let url = "";
+
+      if (filtro === "dia") {
+        const fechaStr = fecha.toISOString().split("T")[0];
+        url = `${apiUrl}/exportar-resumen-dia?fecha=${fechaStr}`;
+      } else if (filtro === "semana") {
+        const fechaHasta = new Date(fecha);
+        const fechaDesde = new Date(fecha);
+        fechaDesde.setDate(fechaDesde.getDate() - 6);
+        const desdeStr = fechaDesde.toISOString();
+        const hastaStr = fechaHasta.toISOString();
+        url = `${apiUrl}/exportar-pdf-semana?desde=${desdeStr}&hasta=${hastaStr}`;
+      } else if (filtro === "mes") {
+        const mes = fecha.toISOString().slice(0, 7);
+        url = `${apiUrl}/exportar-pdf-mes?mes=${mes}`;
+      } else if (filtro === "anio") {
+        const anio = fecha.getFullYear();
+        url = `${apiUrl}/exportar-pdf-anio?anio=${anio}`;
+      } else if (filtro === "rango") {
+        const desdeStr = desde.toISOString();
+        const hastaStr = hasta.toISOString();
+        url = `${apiUrl}/exportar-pdf-semana?desde=${desdeStr}&hasta=${hastaStr}`;
+      }
+
+      const response = await fetch(url, { headers });
+
+      if (!response.ok) {
+        throw new Error("Error al exportar PDF");
+      }
+
+      const blob = await response.blob();
+      const pdfUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = pdfUrl;
+
+      let nombreArchivo = "ResumenCaja.pdf";
+      if (filtro === "dia") nombreArchivo = `ResumenCaja_${fecha.toISOString().split("T")[0]}.pdf`;
+      else if (filtro === "mes") nombreArchivo = `ResumenCaja_${fecha.toISOString().slice(0, 7)}.pdf`;
+      else if (filtro === "anio") nombreArchivo = `ResumenCaja_${fecha.getFullYear()}.pdf`;
+
+      link.download = nombreArchivo;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error("Error al exportar PDF:", error);
+      alert("Hubo un error al exportar el PDF.");
+    }
+  };
+
+  const verDetalles = (fecha) => {
+    const fechaStr = new Date(fecha).toISOString().split("T")[0];
+    navigate(`/admin/caja/detalle?fecha=${fechaStr}`);
   };
 
   return (
@@ -227,34 +263,53 @@ const ResumenCaja = () => {
       </div>
 
       {!loading && !error && (
-        <Table bordered hover>
-          <thead className="table-dark">
-            <tr>
-              <th>IdCaja</th>
-              <th>Fecha</th>
-              <th>Total Ingresos</th>
-              <th>Total Egresos</th>
-            </tr>
-          </thead>
-          <tbody>
-            {cajas.length === 0 ? (
+        <>
+          {cajas.length > 1 && (
+            <Alert variant="info">
+              <strong>Totales Generales:</strong><br />
+              Ingresos: ${cajas.reduce((acc, c) => acc + c.totalIngresos, 0).toFixed(2)} |{" "}
+              Egresos: ${cajas.reduce((acc, c) => acc + c.totalEgresos, 0).toFixed(2)} |{" "}
+              Neto: ${cajas.reduce((acc, c) => acc + (c.totalIngresos - c.totalEgresos), 0).toFixed(2)}
+            </Alert>
+          )}
+
+          <Table bordered hover>
+            <thead className="table-dark">
               <tr>
-                <td colSpan={4} className="text-center text-muted fst-italic">
-                  No hay datos para mostrar para la fecha seleccionada.
-                </td>
+                {cajas.length > 1 && <th>IdCaja</th>}
+                <th>Fecha</th>
+                <th>Ingresos (Bruto)</th>
+                <th>Egresos</th>
+                <th>Neto</th>
+                <th>Detalles</th>
               </tr>
-            ) : (
-              cajas.map((caja, index) => (
-                <tr key={index}>
-                  <td>{caja.idCaja ?? "-"}</td>
-                  <td>{caja.fecha ? new Date(caja.fecha).toLocaleDateString() : "-"}</td>
-                  <td>${caja.totalIngresos?.toFixed(2) ?? "0.00"}</td>
-                  <td>${caja.totalEgresos?.toFixed(2) ?? "0.00"}</td>
+            </thead>
+            <tbody>
+              {cajas.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="text-center text-muted fst-italic">
+                    No hay datos para mostrar para la fecha seleccionada.
+                  </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </Table>
+              ) : (
+                cajas.map((caja, index) => (
+                  <tr key={index}>
+                    {cajas.length > 1 && <td>{caja.idCaja ?? "-"}</td>}
+                    <td>{caja.fecha ? new Date(caja.fecha).toLocaleDateString() : "-"}</td>
+                    <td>${caja.totalIngresos?.toFixed(2) ?? "0.00"}</td>
+                    <td>${caja.totalEgresos?.toFixed(2) ?? "0.00"}</td>
+                    <td>${((caja.totalIngresos ?? 0) - (caja.totalEgresos ?? 0)).toFixed(2)}</td>
+                    <td>
+                      <Button variant="info" onClick={() => verDetalles(caja.fecha)}>
+                        Ver Detalles
+                      </Button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </Table>
+        </>
       )}
     </Container>
   );

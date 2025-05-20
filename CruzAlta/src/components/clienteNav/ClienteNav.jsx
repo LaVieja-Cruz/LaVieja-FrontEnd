@@ -1,32 +1,29 @@
-// components/layoutNav/AdminNav.jsx
+// src/components/clienteNav/ClienteNav.jsx
 import { Navbar, Container, Nav, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { GiHabitatDome } from "react-icons/gi";
-import './AdminNav.css'
-const AdminNav = () => {
+
+const ClienteNav = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
- const handleLogoutClick = () => {
-        navigate('/');
-        logout();
-    }
+
+  const handleLogoutClick = () => {
+    navigate('/');
+    logout();
+  };
+
   return (
     <Navbar bg="white" expand="lg" className="shadow-sm py-3">
       <Container>
-        <Navbar.Brand href="/">
+        <Navbar.Brand href="/main">
           <img src="/images/logo.svg" alt="LA VIEJA" height="40" />
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
           <Nav className="ml-auto align-items-center">
-            <Nav.Link className="colortxt" href="/admin/cuenta-corriente">CtaCTE Admin</Nav.Link>
-            
-            <Nav.Link className="colortxt" href="/admin/compras">Compras Proveedor</Nav.Link>
-            <Nav.Link className= "colortxt " href="/admin/caja">Caja</Nav.Link>
-            <Nav.Link className="colortxt" href="/proveedores">Proveedores</Nav.Link>
-            <Nav.Link className= "colortxt " href="/admin/pedidos">Pedidos</Nav.Link>
-            <Nav.Link className= "colortxt " href="/admin/mapa">Mapa Delivery</Nav.Link>
+            <Nav.Link className="colortxt" href="/cuenta-corriente">Mi Cuenta Corriente</Nav.Link>
+            <Nav.Link className="colortxt" href="/menu">Menú</Nav.Link>
+            {/* Agrega más enlaces si deseas */}
             <Button className="ms-3 txtcolor colorbutton" onClick={handleLogoutClick}>
               Cerrar sesión
             </Button>
@@ -37,4 +34,4 @@ const AdminNav = () => {
   );
 };
 
-export default AdminNav;
+export default ClienteNav;
