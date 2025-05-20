@@ -21,7 +21,7 @@ const AdminNav = () => {
         <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
           <Nav className="ml-auto align-items-center">
             <Nav.Link className= "colortxt " href="/admin/caja">Caja</Nav.Link>
-            <Nav.Link className= "colortxt " href="/admin/proovedores">Proovedores</Nav.Link>
+            <Nav.Link className="colortxt" href="/proveedores">Proveedores</Nav.Link>
             <Nav.Link className= "colortxt " href="/admin/pedidos">Pedidos</Nav.Link>
             <Nav.Link className= "colortxt " href="/admin/mapa">Mapa Delivery</Nav.Link>
             <Button className="ms-3 txtcolor colorbutton" onClick={handleLogoutClick}>

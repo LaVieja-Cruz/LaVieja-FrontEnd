@@ -14,6 +14,11 @@ import ChangePassword from './components/changePassword/ChangePassword';
 import PresentationPage from './components/presentationPage/PresentationPage';
 import Pedidos from './components/pedidos/Pedidos';
 import ResumenCaja from './components/resumenCaja/ResumenCaja';
+import ProveedoresPage from './components/proveedores/ProveedoresPage';
+import CrearProveedor from './components/proveedores/CrearProveedor';
+import EditarProveedor from './components/proveedores/EditarProveedor';
+
+
 
 function App() {
   const router = createBrowserRouter([
@@ -83,7 +88,33 @@ function App() {
           <ResumenCaja />
         </Layout>
       )
+    },
+    {
+      path: "/proveedores",
+      element: (
+        <Layout>
+          <ProveedoresPage />
+        </Layout>
+      )
+    },
+    
+    {
+      path: "/proveedores/crear",
+      element: (
+        <Layout>
+          <CrearProveedor />
+        </Layout>
+      )
+    },
+    {
+      path: "/proveedores/editar/:id",
+      element: (
+        <Layout>
+          <EditarProveedor />
+        </Layout>
+      )
     }
+
   ]);
 
   return <RouterProvider router={router} />;
