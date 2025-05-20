@@ -26,6 +26,8 @@ const Pedidos = () => {
   const [error, setError] = useState(null);
   const [clientes, setClientes] = useState([]);
   const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
+  const [deliverySeleccionado, setDeliverySeleccionado] = useState(null);
+
   const [nuevoCliente, setNuevoCliente] = useState({
     nombre: "",
     apellido: "",
@@ -152,17 +154,21 @@ const Pedidos = () => {
     }));
 
     const dto = {
-      FechaPedido: now.toISOString(),
-      HoraPedido: now.toISOString(),
-      HoraEntrega: HoraEntrega.toISOString(),
-      idCliente: clienteSeleccionado,
-      idDelivery: null,
-      Estado: 0,
-      MetodoEntrega: 1,
-      detallesPedidos: detalles,
-    };
+  FechaPedido: now.toISOString(),
+  HoraPedido: now.toISOString(),
+  HoraEntrega: HoraEntrega.toISOString(),
+  idCliente: clienteSeleccionado,
+  idDelivery: deliverySeleccionado,
+  Estado: 0,
+  MetodoEntrega: 1,
+  detallesPedidos: detalles,
+};
+if (!deliverySeleccionado) {
+  showPopup("Debes seleccionar un delivery.", "danger");
+  return;
+}
 
-    console.log(detalles);
+
     try {
       const token = localStorage.getItem("jwtToken");
       const res = await fetch("https://localhost:7042/api/Pedido/Add", {
@@ -431,6 +437,22 @@ const Pedidos = () => {
               )}
             </Card.Body>
           </Card>
+          <Card className="shadow mb-4">
+  <Card.Header className="bg-personalized text-white">
+    Seleccionar Delivery
+  </Card.Header>
+  <Card.Body>
+    <Form.Select
+      value={deliverySeleccionado || ""}
+      onChange={(e) => setDeliverySeleccionado(Number(e.target.value))}
+    >
+      <option value="">Selecciona un delivery...</option>
+      <option value={1}>Delivery 1</option>
+      <option value={2}>Delivery 2</option>
+    </Form.Select>
+  </Card.Body>
+</Card>
+
 
           {/* Columna de resumen */}
 
