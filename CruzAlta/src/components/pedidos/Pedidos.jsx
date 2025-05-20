@@ -162,6 +162,7 @@ const Pedidos = () => {
     detallesPedidos: detalles,
   };
 
+  console.log(detalles);
   try {
     const token = localStorage.getItem("jwtToken");
     const res = await fetch("https://localhost:7042/api/Pedido/Add", {

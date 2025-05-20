@@ -21,7 +21,7 @@ import DetalleCaja from './components/resumenCaja/DetalleCaja';
 import ComprasProveedorPage from './components/compras/ComprasProveedorPage';
 import CuentaCorrienteCliente from './components/cuentaCorriente/CuentaCorrienteCliente';
 import CuentaCorrienteAdmin from './components/cuentaCorriente/CuentaCorrienteAdmin';
-
+import StockManager from './components/stockManager/StockManager';
 
 
 
@@ -148,6 +148,14 @@ function App() {
       element: (
         <Layout>
           <CuentaCorrienteAdmin />
+        </Layout>
+      )
+    },
+    {
+      path: "/admin/stock",
+      element: (
+        <Layout>
+          <StockManager />
         </Layout>
       )
     }
