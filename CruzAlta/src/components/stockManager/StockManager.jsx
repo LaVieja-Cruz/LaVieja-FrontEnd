@@ -32,6 +32,18 @@ const StockManager = () => {
     idComidas: [],
   });
 
+  const [showComidaModal, setShowComidaModal] = useState(false);
+
+const [nuevaComida, setNuevaComida] = useState({
+  comida: "",
+  codComida: 0,
+  stock: 0,
+  precio: 0,
+  activo: true,
+  imagenUrl: "/images/nuevo.png"
+});
+
+
   const showToast = (message, variant = "success") => {
     setToast({ show: true, message, variant });
     setTimeout(() => {
@@ -171,13 +183,53 @@ const StockManager = () => {
 
   if (loading) return <Spinner animation="border" className="m-5" />;
 
+  const crearNuevaComida = async () => {
+  const { comida, codComida, precio, stock } = nuevaComida;
+  if (!comida || !codComida || !precio || !stock) {
+    showToast("Completá todos los campos de la comida", "danger");
+    return;
+  }
+
+  const token = localStorage.getItem("jwtToken");
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  };
+
+  try {
+    const resp = await fetch("https://localhost:7042/api/Comidas/Add", {
+  method: "POST",
+  headers,
+  body: JSON.stringify(nuevaComida),
+});
+
+
+    if (resp.ok) {
+      showToast("Comida creada correctamente", "success");
+      setShowComidaModal(false);
+      const comidasResp = await fetch("https://localhost:7042/api/Comidas/GetAll", { headers });
+      if (comidasResp.ok) setComidas(await comidasResp.json());
+    } else {
+      showToast("Error al crear comida", "danger");
+    }
+  } catch {
+    showToast("Error al conectar con el servidor", "danger");
+  }
+};
+
+
   return (
     <div className="p-4">
       <div className="d-flex justify-content-center mb-3">
-        <Button className="colorbutton" onClick={() => setShowModal(true)}>
-          Añadir Menú
-        </Button>
+        <Button className="colorbutton me-2" onClick={() => setShowComidaModal(true)}>
+  Añadir Comida
+</Button>
+<Button className="colorbutton" onClick={() => setShowModal(true)}>
+  Añadir Menú
+</Button>
+
       </div>
+      
       <div>
         <h3>Administrar Stock</h3>
       </div>
@@ -348,6 +400,63 @@ const StockManager = () => {
           </Form>
         </Modal.Body>
       </Modal>
+      <Modal show={showComidaModal} onHide={() => setShowComidaModal(false)} centered>
+  <Modal.Header closeButton>
+    <Modal.Title>Nueva Comida</Modal.Title>
+  </Modal.Header>
+  <Modal.Body>
+    <Form>
+      <Form.Group className="mb-2">
+        <Form.Label>Nombre</Form.Label>
+        <Form.Control
+          type="text"
+          value={nuevaComida.comida}
+          onChange={(e) => setNuevaComida({ ...nuevaComida, comida: e.target.value })}
+        />
+      </Form.Group>
+      <Form.Group className="mb-2">
+        <Form.Label>Código</Form.Label>
+        <Form.Control
+          type="number"
+          value={nuevaComida.codComida}
+          onChange={(e) => setNuevaComida({ ...nuevaComida, codComida: parseInt(e.target.value) })}
+        />
+      </Form.Group>
+      <Form.Group className="mb-2">
+        <Form.Label>Precio</Form.Label>
+        <Form.Control
+          type="number"
+          value={nuevaComida.precio}
+          onChange={(e) => setNuevaComida({ ...nuevaComida, precio: parseInt(e.target.value) })}
+        />
+      </Form.Group>
+      <Form.Group className="mb-2">
+        <Form.Label>Stock</Form.Label>
+        <Form.Control
+          type="number"
+          value={nuevaComida.stock}
+          onChange={(e) => setNuevaComida({ ...nuevaComida, stock: parseInt(e.target.value) })}
+        />
+      </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Check
+          type="checkbox"
+          label="Activo"
+          checked={nuevaComida.activo}
+          onChange={(e) => setNuevaComida({ ...nuevaComida, activo: e.target.checked })}
+        />
+      </Form.Group>
+
+      <div className="d-flex justify-content-end">
+        <Button variant="secondary" className="me-2" onClick={() => setShowComidaModal(false)}>
+          Cancelar
+        </Button>
+        <Button onClick={crearNuevaComida}>Guardar</Button>
+      </div>
+    </Form>
+  </Modal.Body>
+</Modal>
+
     </div>
   );
 };
