@@ -28,7 +28,7 @@ const StockManager = () => {
     activo: true,
     stock: 0,
     idRestaurante: 1,
-    imagenUrl: "/images/nuevo.png",
+    imagenUrl: "/images/logo-png.png",
     idComidas: [],
   });
 
@@ -40,7 +40,7 @@ const [nuevaComida, setNuevaComida] = useState({
   stock: 0,
   precio: 0,
   activo: true,
-  imagenUrl: "/images/nuevo.png"
+  imagenUrl: "/images/logo-png.png"
 });
 
 
