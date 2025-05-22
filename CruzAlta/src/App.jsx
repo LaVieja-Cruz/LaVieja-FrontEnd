@@ -22,7 +22,7 @@ import ComprasProveedorPage from './components/compras/ComprasProveedorPage';
 import CuentaCorrienteCliente from './components/cuentaCorriente/CuentaCorrienteCliente';
 import CuentaCorrienteAdmin from './components/cuentaCorriente/CuentaCorrienteAdmin';
 import StockManager from './components/stockManager/StockManager';
-
+import ProveedorComprasPage from "./components/proveedores/ProveedorComprasPage";
 
 
 function App() {
@@ -157,6 +157,14 @@ function App() {
         <Layout>
           <StockManager />
         </Layout>
+      )
+    },
+    {
+      path:"/proveedor/detalles/:idProveedor" ,
+      element: (
+      <Layout>
+        <ProveedorComprasPage />
+      </Layout>
       )
     }
 

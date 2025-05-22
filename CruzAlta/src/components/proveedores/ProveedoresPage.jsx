@@ -64,7 +64,7 @@ const ProveedoresPage = () => {
       <Card className="shadow-sm">
         <Card.Header className="bg-personalized text-white">
           <Row className="align-items-center">
-            <Col md={3}>
+            <Col md={4}>
               <Form.Control
                 type="text"
                 placeholder="Buscar por nombre"
@@ -72,26 +72,13 @@ const ProveedoresPage = () => {
                 onChange={(e) => setFiltroNombre(e.target.value)}
               />
             </Col>
-            <Col md={3}>
-              <Form.Control
-                type="date"
-                value={fechaDesde}
-                onChange={(e) => setFechaDesde(e.target.value)}
-              />
-            </Col>
-            <Col md={3}>
-              <Form.Control
-                type="date"
-                value={fechaHasta}
-                onChange={(e) => setFechaHasta(e.target.value)}
-              />
-            </Col>
-            <Col md={3} className="text-end">
+            <Col md={{ span: 4, offset: 4 }} className="text-end">
               <Button className="bg-personalized" onClick={() => navigate("/proveedores/crear")}>
                 Agregar Proveedor
               </Button>
             </Col>
           </Row>
+
         </Card.Header>
         <Card.Body>
           {error && <Alert variant="danger">{error}</Alert>}
@@ -121,6 +108,18 @@ const ProveedoresPage = () => {
                     <td>{p.direccion}</td>
                     <td>{p.nombreCliente ? p.nombreCliente : "-"}</td>
                     <td className="text-center">
+                      <Button
+                        variant="outline-info"
+                        size="sm"
+                        className="me-2"
+                        onClick={() => navigate(`/proveedor/detalles/${p.idProveedor}`)}
+                      >
+                        Ver Detalles
+                      </Button>
+
+
+
+
                       <Button
                         variant="outline-secondary"
                         size="sm"

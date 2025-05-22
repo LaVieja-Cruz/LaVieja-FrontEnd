@@ -5,3 +5,24 @@
 .titulo{
     color:#901C1C;
 }
+
+.btn-delivery {
+  background-color: white !important;
+  color: black !important;
+  border-color: #901C1C !important;
+}
+
+.btn-delivery:hover,
+.btn-delivery:focus,
+.btn-delivery:active,
+.btn-delivery:visited {
+  background-color: #901C1C !important; /* o mismo bordó */
+  color: black !important;
+  border-color: white !important;
+  box-shadow: none !important;
+}
+.btn-delivery.selected {
+  background-color: #901C1C !important;
+  border-color: #ffffff !important;
+  color: white !important;
+}

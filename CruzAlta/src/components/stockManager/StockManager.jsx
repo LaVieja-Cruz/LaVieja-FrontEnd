@@ -19,7 +19,33 @@ const StockManager = () => {
   const [loading, setLoading] = useState(true);
   const [stockData, setStockData] = useState({});
   const [showModal, setShowModal] = useState(false);
+  const [editandoTipo, setEditandoTipo] = useState(null); // "comida" o "menu"
+  const [editandoItem, setEditandoItem] = useState(null); // objeto a editar
+  const [showEditarModal, setShowEditarModal] = useState(false);
+
   const [toast, setToast] = useState({ show: false, message: "", variant: "success" });
+
+  //LIMPIAR NUEVO MENU MODAL
+  const formularioMenuVacio = {
+  nombre: "",
+  descripcion: "",
+  precio: 0,
+  stock: 0,
+  idRestaurante: 1,
+  imagenUrl: "/images/logo-png.png",
+  idComidas: [],
+  activo: true
+};
+
+//LIMPIAR MODAL NUEVA COMIDAS
+const formularioComidaVacio = {
+  comida: "",
+  codComida: 0,
+  precio: 0,
+  stock: 0,
+  activo: true,
+  imagenUrl: "/images/logo-png.png"
+};
 
   const [nuevoMenu, setNuevoMenu] = useState({
     nombre: "",
@@ -118,6 +144,42 @@ const [nuevaComida, setNuevaComida] = useState({
     }
   };
 
+
+  const eliminarItem = async (tipo, id) => {
+  if (!window.confirm("¿Estás seguro de que querés eliminar este ítem?")) return;
+
+  const token = localStorage.getItem("jwtToken");
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  };
+
+  const endpoint =
+    tipo === "comida"
+      ? `https://localhost:7042/api/Comidas/Delete/${id}`
+      : `https://localhost:7042/api/Menus/${id}`;;
+
+  try {
+    const resp = await fetch(endpoint, { method: "DELETE", headers });
+    if (resp.ok) {
+      showToast(`${tipo === "comida" ? "Comida" : "Menú"} eliminado correctamente`, "success");
+
+      // actualizar data
+      const [comidasRes, menusRes] = await Promise.all([
+        fetch("https://localhost:7042/api/Comidas/GetAll", { headers }),
+        fetch("https://localhost:7042/api/Menus", { headers }),
+      ]);
+      if (comidasRes.ok) setComidas(await comidasRes.json());
+      if (menusRes.ok) setMenus(await menusRes.json());
+    } else {
+      showToast("Error al eliminar", "danger");
+    }
+  } catch {
+    showToast("Error de red al eliminar", "danger");
+  }
+};
+
+
   const toggleActivo = async (tipo, id, estadoActual) => {
     const token = localStorage.getItem("jwtToken");
     const headers = {
@@ -170,9 +232,22 @@ const [nuevaComida, setNuevaComida] = useState({
 
       if (resp.ok) {
         showToast("Menú creado correctamente", "success");
+        setNuevoMenu(formularioMenuVacio);
         setShowModal(false);
         const menusResp = await fetch("https://localhost:7042/api/Menus", { headers });
-        if (menusResp.ok) setMenus(await menusResp.json());
+        if (menusResp.ok) {
+          const nuevosMenus = await menusResp.json();
+          setMenus(nuevosMenus);
+
+          // 🔁 Actualizar stockData con los menús
+          setStockData((prev) => {
+            const nuevosStocks = { ...prev };
+            nuevosMenus.forEach((m) => {
+              nuevosStocks[`menu-${m.idMenu}`] = m.stock ?? 0;
+            });
+            return nuevosStocks;
+          });
+        }
       } else {
         showToast("Error al crear el menú", "danger");
       }
@@ -185,10 +260,11 @@ const [nuevaComida, setNuevaComida] = useState({
 
   const crearNuevaComida = async () => {
   const { comida, codComida, precio, stock } = nuevaComida;
-  if (!comida || !codComida || !precio || !stock) {
-    showToast("Completá todos los campos de la comida", "danger");
-    return;
-  }
+  if (!nuevaComida.comida) {
+  showToast("El nombre de la comida es obligatorio", "danger");
+  return;
+}
+
 
   const token = localStorage.getItem("jwtToken");
   const headers = {
@@ -198,14 +274,23 @@ const [nuevaComida, setNuevaComida] = useState({
 
   try {
     const resp = await fetch("https://localhost:7042/api/Comidas/Add", {
-  method: "POST",
-  headers,
-  body: JSON.stringify(nuevaComida),
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+      comida: nuevaComida.comida,
+      codComida: 0,
+      precio: 0,
+      stock: 0,
+      activo: nuevaComida.activo,
+      imagenUrl: "/images/logo-png.png"
+    }),
+
 });
 
 
     if (resp.ok) {
       showToast("Comida creada correctamente", "success");
+      setNuevaComida(formularioComidaVacio);  
       setShowComidaModal(false);
       const comidasResp = await fetch("https://localhost:7042/api/Comidas/GetAll", { headers });
       if (comidasResp.ok) setComidas(await comidasResp.json());
@@ -235,99 +320,309 @@ const [nuevaComida, setNuevaComida] = useState({
       </div>
 
       <Row>
-        <Col xs={12} md={6}>
-          <h5 className="text-center">Comidas</h5>
-          <Table striped bordered hover>
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Stock</th>
-                <th>Estado</th>
-                <th>Actualizar</th>
-              </tr>
-            </thead>
-            <tbody>
-              {comidas.map((c) => (
-                <tr key={`comida-${c.idComida}`}>
-                  <td>{c.comida}</td>
-                  <td>
-                    <FormControl
-                      type="number"
-                      value={stockData[`comida-${c.idComida}`] || ""}
-                      onChange={(e) => handleStockChange(`comida-${c.idComida}`, e.target.value)}
-                    />
-                  </td>
-                  <td>{c.activo ? "Activo" : "Inactivo"}</td>
+  <Col xs={12} md={6}>
+  <h5 className="text-center">Comidas</h5>
+  <Table striped bordered hover>
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Estado</th>
+        <th>Actualizar</th>
+      </tr>
+    </thead>
+    <tbody>
+      {[...comidas]
+        .sort((a, b) => {
+          if (a.activo !== b.activo) return a.activo ? -1 : 1;
+          return a.comida.localeCompare(b.comida);
+        }).map((c) => (
+          <tr key={`comida-${c.idComida}`}>
+            <td>{c.comida}</td>
+            <td>{c.activo ? "Activo" : "Inactivo"}</td>
+            <td>
+              <div className="d-flex gap-2">
+                <Button
+                  size="sm"
+                  variant={c.activo ? "outline-danger" : "outline-success"}
+                  onClick={() => toggleActivo("comida", c.idComida, c.activo)}
+                >
+                  {c.activo ? "Desactivar" : "Activar"}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="warning"
+                  onClick={() => {
+                    const comidaActual = comidas.find(x => x.idComida === c.idComida);
+                    setEditandoTipo("comida");
+                    setEditandoItem({ ...comidaActual });
+                    setShowEditarModal(true);
+                  }}
+                >
+                  Editar
+                </Button>
+                <Button
+                  size="sm"
+                  variant="danger"
+                  onClick={() => eliminarItem("comida", c.idComida)}
+                >
+                  Eliminar
+                </Button>
+              </div>
+            </td>
+          </tr>
+        ))}
+    </tbody>
+  </Table>
+</Col>
 
-                  <td>
-                    <div className="d-flex gap-2">
-                      <Button size="sm" className="colorbutton" onClick={() => actualizarStock("comida", c.idComida)}>
-                        Guardar
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant={c.activo ? "outline-danger" : "outline-success"}
-                        onClick={() => toggleActivo("comida", c.idComida, c.activo)}
-                      >
-                        {c.activo ? "Desactivar" : "Activar"}
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        </Col>
 
-        <Col xs={12} md={6}>
-          <h5 className="text-center">Menús</h5>
-          <Table striped bordered hover>
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Stock</th>
-                <th>Estado</th>
-                <th>Actualizar</th>
-              </tr>
-            </thead>
-            <tbody>
-              {menus.map((m) => (
-                <tr key={`menu-${m.idMenu}`}>
-                  <td>{m.nombre}</td>
-                  <td>
-                    <FormControl
-                      type="number"
-                      value={stockData[`menu-${m.idMenu}`] || ""}
-                      onChange={(e) => handleStockChange(`menu-${m.idMenu}`, e.target.value)}
-                    />
-                  </td>
-                  <td>{m.activo ? "Activo" : "Inactivo"}</td>
-                  <td>
-                    <div className="d-flex gap-2">
-                      <Button size="sm" className="colorbutton" onClick={() => actualizarStock("menu", m.idMenu)}>
-                        Guardar
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant={m.activo ? "outline-danger" : "outline-success"}
-                        onClick={() => toggleActivo("menu", m.idMenu, m.activo)}
-                      >
-                        {m.activo ? "Desactivar" : "Activar"}
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        </Col>
-      </Row>
+  <Col xs={12} md={6}>
+    <h5 className="text-center">Menús</h5>
+    <Table striped bordered hover>
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Precio</th>
+          <th>Stock</th>
+          <th>Estado</th>
+          <th>Actualizar</th>
+        </tr>
+      </thead>
+      <tbody>
+        {[...menus]
+          .sort((a, b) => {
+            if (a.activo !== b.activo) return a.activo ? -1 : 1;
+            return a.nombre.localeCompare(b.nombre);
+          }).map((m) => (
+            <tr key={`menu-${m.idMenu}`}>
+              <td>{m.nombre}</td>
+              <td>${m.precio}</td>
+              <td>
+                <FormControl
+                  type="number"
+                  value={stockData[`menu-${m.idMenu}`] || ""}
+                  readOnly
+                  style={{ width: "80px" }}
+                />
+              </td>
+              <td>{m.activo ? "Activo" : "Inactivo"}</td>
+              <td>
+                <div className="d-flex gap-2">
+                  <Button
+                    size="sm"
+                    variant={m.activo ? "outline-danger" : "outline-success"}
+                    onClick={() => toggleActivo("menu", m.idMenu, m.activo)}
+                  >
+                    {m.activo ? "Desactivar" : "Activar"}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="warning"
+                    onClick={() => {
+                      const menuActual = menus.find(x => x.idMenu === m.idMenu);
+                      const stockActual = stockData[`menu-${m.idMenu}`];
+                      setEditandoTipo("menu");
+                      setEditandoItem({ ...menuActual, stock: stockActual });
+                      setShowEditarModal(true);
+                    }}
+                  >
+                    Editar
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="danger"
+                    onClick={() => eliminarItem("menu", m.idMenu)}
+                  >
+                    Eliminar
+                  </Button>
+                </div>
+              </td>
+            </tr>
+          ))}
+      </tbody>
+    </Table>
+  </Col>
+</Row>
 
-      <ToastContainer position="bottom-end" className="p-3">
+
+      <ToastContainer  className="position-fixed top-50 start-50 translate-middle"
+        style={{ zIndex: 9999 }}>
         <Toast bg={toast.variant} show={toast.show} onClose={() => setToast({ ...toast, show: false })}>
           <Toast.Body className="text-white">{toast.message}</Toast.Body>
         </Toast>
       </ToastContainer>
+
+      <Modal show={showEditarModal} onHide={() => setShowEditarModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Editar {editandoTipo === "comida" ? "Comida" : "Menú"}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {editandoItem && (
+  <Form>
+  <Form.Group className="mb-2">
+    <Form.Label>Nombre</Form.Label>
+    <Form.Control
+      type="text"
+      value={editandoItem.comida || editandoItem.nombre}
+      onChange={(e) =>
+        setEditandoItem({
+          ...editandoItem,
+          comida: editandoTipo === "comida" ? e.target.value : undefined,
+          nombre: editandoTipo === "menu" ? e.target.value : undefined,
+        })
+      }
+    />
+  </Form.Group>
+
+  {editandoTipo === "comida" && (
+    <Form.Group className="mb-3">
+      <Form.Check
+        type="checkbox"
+        label="Activo"
+        checked={editandoItem.activo}
+        onChange={(e) =>
+          setEditandoItem({
+            ...editandoItem,
+            activo: e.target.checked,
+          })
+        }
+      />
+    </Form.Group>
+  )}
+
+  {editandoTipo === "menu" && (
+    <>
+      <Form.Group className="mb-2">
+        <Form.Label>Descripción</Form.Label>
+        <Form.Control
+          type="text"
+          value={editandoItem.descripcion}
+          onChange={(e) =>
+            setEditandoItem({ ...editandoItem, descripcion: e.target.value })
+          }
+        />
+      </Form.Group>
+
+      <Form.Group className="mb-2">
+        <Form.Label>Precio</Form.Label>
+        <Form.Control
+          type="number"
+          value={editandoItem.precio}
+          onChange={(e) =>
+            setEditandoItem({ ...editandoItem, precio: parseFloat(e.target.value) })
+          }
+        />
+      </Form.Group>
+
+      <Form.Group className="mb-2">
+        <Form.Label>Stock</Form.Label>
+        <Form.Control
+          type="number"
+          value={editandoItem.stock}
+          onChange={(e) =>
+            setEditandoItem({ ...editandoItem, stock: parseInt(e.target.value) })
+          }
+        />
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Check
+          type="checkbox"
+          label="Activo"
+          checked={editandoItem.activo}
+          onChange={(e) =>
+            setEditandoItem({ ...editandoItem, activo: e.target.checked })
+          }
+        />
+      </Form.Group>
+    </>
+  )}
+
+  <div className="d-flex justify-content-end mt-3">
+    <Button variant="secondary" className="me-2" onClick={() => {setNuevoMenu(formularioMenuVacio); setShowEditarModal(false)}}>
+      Cancelar
+    </Button>
+    <Button variant="primary" onClick={async () => {
+      const token = localStorage.getItem("jwtToken");
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+
+      let endpoint = "";
+      let payload = {};
+
+      if (editandoTipo === "comida") {
+        endpoint = `https://localhost:7042/api/Comidas/Update/${editandoItem.idComida}`;
+        payload = {
+          comida: editandoItem.comida,
+          codComida: editandoItem.codComida ?? 0,
+          activo: editandoItem.activo ?? true,
+          precio: 0 // si tu backend lo requiere
+        };
+      } else {
+        endpoint = `https://localhost:7042/api/Menus/${editandoItem.idMenu}`;
+        payload = {
+          idMenu: editandoItem.idMenu,
+          nombre: editandoItem.nombre,
+          descripcion: editandoItem.descripcion,
+          precio: editandoItem.precio,
+          stock: editandoItem.stock,
+          idRestaurante: editandoItem.idRestaurante,
+          activo: editandoItem.activo,
+          imagenUrl: editandoItem.imagenUrl,
+          idComidas: editandoItem.idComidas ?? []
+        };
+      }
+
+      try {
+        const resp = await fetch(endpoint, {
+          method: "PUT",
+          headers,
+          body: JSON.stringify(payload),
+        });
+
+        if (resp.ok) {
+          showToast(`${editandoTipo === "comida" ? "Comida" : "Menú"} actualizado`, "success");
+          setShowEditarModal(false);
+
+          const [comidasRes, menusRes] = await Promise.all([
+            fetch("https://localhost:7042/api/Comidas/GetAll", { headers }),
+            fetch("https://localhost:7042/api/Menus", { headers }),
+          ]);
+
+          const comidasData = comidasRes.ok ? await comidasRes.json() : [];
+          const menusData = menusRes.ok ? await menusRes.json() : [];
+
+          setComidas(comidasData);
+          setMenus(menusData);
+
+          const nuevoStockData = {};
+          comidasData.forEach((c) => {
+            nuevoStockData[`comida-${c.idComida}`] = c.stock ?? 0;
+          });
+          menusData.forEach((m) => {
+            nuevoStockData[`menu-${m.idMenu}`] = m.stock ?? 0;
+          });
+          setStockData(nuevoStockData);
+
+        } else {
+          showToast("Error al actualizar", "danger");
+        }
+      } catch {
+        showToast("Error de red al actualizar", "danger");
+      }
+    }}>
+      Guardar
+    </Button>
+  </div>
+</Form>
+
+          )}
+        </Modal.Body>
+      </Modal>
+
+
 
       <Modal show={showModal} onHide={() => setShowModal(false)} centered>
         <Modal.Header closeButton>
@@ -375,11 +670,15 @@ const [nuevaComida, setNuevaComida] = useState({
               <Form.Label>Comidas asociadas</Form.Label>
               <Select
                 isMulti
-                options={comidas.map((c) => ({ value: c.idComida, label: c.comida }))}
+                options={comidas
+                  .filter((c) => c.activo) //  Solo comidas activas
+                  .map((c) => ({ value: c.idComida, label: c.comida }))
+                }
                 onChange={(selected) =>
                   setNuevoMenu({ ...nuevoMenu, idComidas: selected.map((s) => s.value) })
                 }
               />
+
             </Form.Group>
 
             <Form.Group className="mb-3">
@@ -392,7 +691,7 @@ const [nuevaComida, setNuevaComida] = useState({
             </Form.Group>
 
             <div className="d-flex justify-content-end">
-              <Button variant="secondary" className="me-2" onClick={() => setShowModal(false)}>
+              <Button variant="secondary" className="me-2" onClick={() => {setNuevoMenu(formularioMenuVacio); setShowModal(false)}}>
                 Cancelar
               </Button>
               <Button onClick={crearNuevoMenu}>Guardar</Button>
@@ -414,30 +713,7 @@ const [nuevaComida, setNuevaComida] = useState({
           onChange={(e) => setNuevaComida({ ...nuevaComida, comida: e.target.value })}
         />
       </Form.Group>
-      <Form.Group className="mb-2">
-        <Form.Label>Código</Form.Label>
-        <Form.Control
-          type="number"
-          value={nuevaComida.codComida}
-          onChange={(e) => setNuevaComida({ ...nuevaComida, codComida: parseInt(e.target.value) })}
-        />
-      </Form.Group>
-      <Form.Group className="mb-2">
-        <Form.Label>Precio</Form.Label>
-        <Form.Control
-          type="number"
-          value={nuevaComida.precio}
-          onChange={(e) => setNuevaComida({ ...nuevaComida, precio: parseInt(e.target.value) })}
-        />
-      </Form.Group>
-      <Form.Group className="mb-2">
-        <Form.Label>Stock</Form.Label>
-        <Form.Control
-          type="number"
-          value={nuevaComida.stock}
-          onChange={(e) => setNuevaComida({ ...nuevaComida, stock: parseInt(e.target.value) })}
-        />
-      </Form.Group>
+      
       <Form.Group className="mb-3">
         <Form.Check
           type="checkbox"
@@ -448,7 +724,7 @@ const [nuevaComida, setNuevaComida] = useState({
       </Form.Group>
 
       <div className="d-flex justify-content-end">
-        <Button variant="secondary" className="me-2" onClick={() => setShowComidaModal(false)}>
+        <Button variant="secondary" className="me-2" onClick={() => { setNuevoMenu(formularioMenuVacio); setShowComidaModal(false)}}>
           Cancelar
         </Button>
         <Button onClick={crearNuevaComida}>Guardar</Button>

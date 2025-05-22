@@ -11,6 +11,7 @@ export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [watchId, setWatchId] = useState(null);
   const [role, setRole] = useState(null);
+  const [user, setUser] = useState(null);
 
 
   useEffect(() => {
@@ -18,16 +19,12 @@ export const AuthProvider = ({ children }) => {
   if (token) {
     try {
       const decoded = jwtDecode(token);
-     
-      setIsLoggedIn(true);
-
-      // Accede a la propiedad `role` usando la ruta correcta
       const role = decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
-      if (role) {
-        setRole(role);  // Guarda el Rol en el estado
-      } else {
-        console.error("El token no contiene la propiedad 'role'.");
-      }
+      const id = decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
+
+      setUser({ id, role, token }); // 👈 importante
+      setRole(role);
+      setIsLoggedIn(true);
     } catch (error) {
       console.error("Error decodificando el token:", error);
     }
@@ -82,11 +79,13 @@ export const AuthProvider = ({ children }) => {
   setIsLoggedIn(true);
 
   const decoded = jwtDecode(token);
-
-  // Accede al role correctamente
   const role = decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+  const id = decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
+
   setRole(role);
+  setUser({ id, role, token }); // <-- NUEVO
 };
+
 
 
   const logout = () => {
@@ -97,7 +96,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout, role }}>
+    <AuthContext.Provider value={{ isLoggedIn, login, logout, role, user }}>
+
       {children}
     </AuthContext.Provider>
   );
