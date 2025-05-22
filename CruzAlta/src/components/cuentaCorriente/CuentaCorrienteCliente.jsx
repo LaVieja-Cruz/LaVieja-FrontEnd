@@ -3,9 +3,10 @@ import { Container, Spinner, Alert, Table } from "react-bootstrap";
 
 const CuentaCorrienteCliente = () => {
   const [movimientos, setMovimientos] = useState([]);
-  const [saldo, setSaldo] = useState(0);
+  const [saldo, setSaldo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [tieneCuenta, setTieneCuenta] = useState(true);
 
   const apiMovimientos = "https://localhost:7042/api/CuentaCorriente/movimientos";
 
@@ -18,7 +19,10 @@ const CuentaCorrienteCliente = () => {
         };
 
         const response = await fetch(apiMovimientos, { headers });
-        if (!response.ok) throw new Error("Error al cargar los datos de cuenta corriente");
+        if (!response.ok) {
+          setTieneCuenta(false);
+          throw new Error("Aun no tienes una cuenta corriente.");
+        }
 
         const data = await response.json();
         setMovimientos(data.movimientos);
@@ -40,7 +44,11 @@ const CuentaCorrienteCliente = () => {
       {loading && <Spinner animation="border" />}
       {error && <Alert variant="danger">{error}</Alert>}
 
-      {!loading && !error && (
+      {!tieneCuenta && !loading && (
+        <Alert variant="warning">Aún no tienes una cuenta corriente asignada.</Alert>
+      )}
+
+      {tieneCuenta && saldo !== null && (
         <>
           <Alert variant={saldo >= 0 ? "success" : "danger"}>
             {saldo >= 0

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Container, Form, Table, Alert, Spinner } from "react-bootstrap";
+import { Container, Form, Table, Alert, Spinner, Button } from "react-bootstrap";
 
 const CuentaCorrienteAdmin = () => {
   const [clientes, setClientes] = useState([]);
@@ -8,6 +8,7 @@ const CuentaCorrienteAdmin = () => {
   const [saldo, setSaldo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [tieneCuenta, setTieneCuenta] = useState(true);
 
   const baseUrl = "https://localhost:7042/api";
 
@@ -41,17 +42,43 @@ const CuentaCorrienteAdmin = () => {
       const resMov = await fetch(`${baseUrl}/CuentaCorriente/movimientos/${idCliente}`, { headers });
       const resSaldo = await fetch(`${baseUrl}/CuentaCorriente/saldo/${idCliente}`, { headers });
 
-      if (!resMov.ok || !resSaldo.ok) throw new Error("Error al obtener movimientos");
+      if (!resMov.ok || !resSaldo.ok) {
+        setTieneCuenta(false);
+        setMovimientos([]);
+        setSaldo(null);
+        return;
+      }
 
       const movimientosData = await resMov.json();
       const saldoData = await resSaldo.json();
 
-      setMovimientos(movimientosData); // lista directa
+      setMovimientos(movimientosData);
       setSaldo(saldoData.saldo);
+      setTieneCuenta(true);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const crearCuentaCorriente = async () => {
+    if (!clienteSeleccionado) return;
+    try {
+      const token = localStorage.getItem("jwtToken");
+      const headers = { Authorization: `Bearer ${token}` };
+
+      const res = await fetch(`${baseUrl}/CuentaCorriente/crear/${clienteSeleccionado}`, {
+        method: "POST",
+        headers,
+      });
+
+      if (!res.ok) throw new Error("No se pudo crear la cuenta");
+
+      alert("Cuenta creada exitosamente.");
+      handleChangeCliente({ target: { value: clienteSeleccionado } }); // refrescar datos
+    } catch (err) {
+      alert("Error: " + err.message);
     }
   };
 
@@ -74,7 +101,16 @@ const CuentaCorrienteAdmin = () => {
       {loading && <Spinner animation="border" />}
       {error && <Alert variant="danger">{error}</Alert>}
 
-      {saldo !== null && (
+      {!tieneCuenta && clienteSeleccionado && (
+        <Alert variant="warning">
+          Este cliente aún no tiene cuenta corriente.{" "}
+          <Button size="sm" onClick={crearCuentaCorriente}>
+            Crear Cuenta Corriente
+          </Button>
+        </Alert>
+      )}
+
+      {tieneCuenta && saldo !== null && (
         <Alert variant={saldo >= 0 ? "success" : "danger"}>
           {saldo >= 0
             ? `Saldo a favor del cliente: $${saldo.toFixed(2)}`
@@ -82,32 +118,34 @@ const CuentaCorrienteAdmin = () => {
         </Alert>
       )}
 
-      <Table bordered hover>
-        <thead className="table-dark">
-          <tr>
-            <th>Fecha</th>
-            <th>Concepto</th>
-            <th>Monto</th>
-            <th>Tipo</th>
-          </tr>
-        </thead>
-        <tbody>
-          {movimientos.length === 0 ? (
+      {tieneCuenta && (
+        <Table bordered hover>
+          <thead className="table-dark">
             <tr>
-              <td colSpan={4} className="text-center">Sin movimientos</td>
+              <th>Fecha</th>
+              <th>Concepto</th>
+              <th>Monto</th>
+              <th>Tipo</th>
             </tr>
-          ) : (
-            movimientos.map((mov, idx) => (
-              <tr key={idx}>
-                <td>{new Date(mov.fecha).toLocaleDateString()}</td>
-                <td>{mov.descripcion}</td>
-                <td>${mov.monto.toFixed(2)}</td>
-                <td>{mov.esHaber ? "Haber" : "Debe"}</td>
+          </thead>
+          <tbody>
+            {movimientos.length === 0 ? (
+              <tr>
+                <td colSpan={4} className="text-center">Sin movimientos</td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </Table>
+            ) : (
+              movimientos.map((mov, idx) => (
+                <tr key={idx}>
+                  <td>{new Date(mov.fecha).toLocaleDateString()}</td>
+                  <td>{mov.descripcion}</td>
+                  <td>${mov.monto.toFixed(2)}</td>
+                  <td>{mov.esHaber ? "Haber" : "Debe"}</td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </Table>
+      )}
     </Container>
   );
 };
