@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Container, Form, Table, Alert, Spinner, Button } from "react-bootstrap";
-
+import  Select from "react-select";
+ 
 const CuentaCorrienteAdmin = () => {
   const [clientes, setClientes] = useState([]);
   const [clienteSeleccionado, setClienteSeleccionado] = useState("");
@@ -87,17 +88,18 @@ const CuentaCorrienteAdmin = () => {
       <h3>Cuenta Corriente de Clientes</h3>
 
       <Form.Group controlId="clienteSelect" className="my-3">
-        <Form.Label>Seleccionar cliente</Form.Label>
-        <Form.Select value={clienteSeleccionado} onChange={handleChangeCliente}>
-          <option value="">-- Seleccione --</option>
-          {clientes.map((c) => (
-            <option key={c.idCliente} value={c.idCliente}>
-              {c.nombre} {c.apellido}
-            </option>
-          ))}
-        </Form.Select>
-      </Form.Group>
-
+  <Form.Label>Seleccionar cliente</Form.Label>
+  <Select
+    value={clientes.find(c => c.idCliente === clienteSeleccionado) || null}
+    onChange={(opcion) => handleChangeCliente({ target: { value: opcion.value } })}
+    options={clientes.map((c) => ({
+      value: c.idCliente,
+      label: `${c.nombre} ${c.apellido}`
+    }))}
+    placeholder="-- Seleccione --"
+    isClearable
+  />
+</Form.Group>
       {loading && <Spinner animation="border" />}
       {error && <Alert variant="danger">{error}</Alert>}
 
