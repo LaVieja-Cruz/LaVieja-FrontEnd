@@ -11,7 +11,7 @@ import {
   Alert,
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-
+import './Proveedores.css'
 const ProveedoresPage = () => {
   const [proveedores, setProveedores] = useState([]);
   const [filtroNombre, setFiltroNombre] = useState("");
@@ -73,7 +73,7 @@ const ProveedoresPage = () => {
               />
             </Col>
             <Col md={{ span: 4, offset: 4 }} className="text-end">
-              <Button className="bg-personalized" onClick={() => navigate("/proveedores/crear")}>
+              <Button className="buttoncolor" onClick={() => navigate("/proveedores/crear")}>
                 Agregar Proveedor
               </Button>
             </Col>

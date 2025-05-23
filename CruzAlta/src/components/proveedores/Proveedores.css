@@ -1,0 +1,20 @@
+.buttoncolor{
+    border-color: white;
+    background-color: #901C1C;
+}
+
+
+.buttoncolor:hover,
+.buttoncolor:focus,
+.buttoncolor:active,
+.buttoncolorvisited {
+  background-color: white !important; /* o mismo bordó */
+  color: #901C1C !important;
+  border-color: white !important;
+  box-shadow: none !important;
+}
+.buttoncolor.selected {
+  background-color: #901C1C !important;
+  border-color: #ffffff !important;
+  color: white !important;
+}
