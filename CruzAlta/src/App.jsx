@@ -23,6 +23,7 @@ import CuentaCorrienteCliente from './components/cuentaCorriente/CuentaCorriente
 import CuentaCorrienteAdmin from './components/cuentaCorriente/CuentaCorrienteAdmin';
 import StockManager from './components/stockManager/StockManager';
 import ProveedorComprasPage from "./components/proveedores/ProveedorComprasPage";
+import CocinaPage from "./components/cocina/CocinaPage";
 
 
 function App() {
@@ -62,8 +63,8 @@ function App() {
        {path: "/change-password",
     element: <ChangePassword/>
       },
-    {path: "admin/pedidos",
-   element: 
+    { path: "admin/pedidos",
+      element: 
       (
         <Layout>
           <Pedidos/>
@@ -166,7 +167,15 @@ function App() {
         <ProveedorComprasPage />
       </Layout>
       )
-    }
+    },
+    { path: "admin/cocina",
+      element: 
+      (
+        <Layout>
+          <CocinaPage/>
+        </Layout>
+      )
+      }
 
 
 

@@ -1,0 +1,27 @@
+/*.cocina-table tbody tr:nth-child(even) td {
+  background-color: #80000010 !important;
+}
+
+.cocina-table tbody tr:nth-child(odd) td {
+  background-color: #901C1C      !important;
+}
+
+/*ENCABEZADO
+.cocina-table th {
+  background-color: #800000 !important;
+  color: white !important;
+}*/
+
+
+.cocina-table tbody tr:nth-child(even) {
+  background-color: #80000010; /* bordo clarito */
+}
+
+.cocina-table tbody tr:nth-child(odd) {
+  background-color: white;
+}
+
+.cocina-table th {
+  background-color: #800000; /* bordo fuerte */
+  color: white;
+}
