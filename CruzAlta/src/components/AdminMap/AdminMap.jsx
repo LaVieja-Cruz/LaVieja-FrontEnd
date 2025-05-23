@@ -3,6 +3,8 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import axios from "axios";
+import motoIcon from "../../assets/delivery-bike.png";
+
 
 const AdminMap = () => {
   const [locations, setLocations] = useState([]);
@@ -13,6 +15,11 @@ const AdminMap = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const icon = new L.Icon({
+  iconUrl: motoIcon,
+  iconSize: [40, 40],
+  iconAnchor: [20, 40],
+});
   const fetchLocations = async () => {
     try {
       const res = await axios.get("https://localhost:7042/api/ubicacion/all", {
@@ -26,11 +33,8 @@ const AdminMap = () => {
     }
   };
 
-  const icon = new L.Icon({
-    iconUrl: "https://cdn-icons-png.flaticon.com/512/2972/2972185.png",
-    iconSize: [32, 32],
-    iconAnchor: [16, 32]
-  });
+  
+   
 
   return (
     <MapContainer center={[-32.99029669632476, -61.792591957670815]} zoom={14} style={{ height: "600px", width: "100%" }}>
