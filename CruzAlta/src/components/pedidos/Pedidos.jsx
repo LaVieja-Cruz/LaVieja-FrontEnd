@@ -363,6 +363,106 @@ const Pedidos = () => {
               </Card>
             </Col>
           </Row>
+                   {/* Modal crear cliente */}
+          <Modal
+            show={mostrarFormularioCliente}
+            onHide={() => setMostrarFormularioCliente(false)}
+            centered
+          >
+            <Modal.Header closeButton>
+              <Modal.Title>Agregar Nuevo Cliente</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <Form>
+                {["nombre", "apellido", "direccion1", "telefono"].map(
+                  (field) => (
+                    <Form.Group className="mb-2" key={field}>
+                      <Form.Control
+                        type="text"
+                        placeholder={
+                          field.charAt(0).toUpperCase() + field.slice(1)
+                        }
+                        value={nuevoCliente[field]}
+                        onChange={(e) =>
+                          setNuevoCliente({
+                            ...nuevoCliente,
+                            [field]: e.target.value,
+                          })
+                        }
+                      />
+                    </Form.Group>
+                  )
+                )}
+              </Form>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button
+                variant="secondary"
+                onClick={() => setMostrarFormularioCliente(false)}
+              >
+                Cancelar
+              </Button>
+              <Button
+  className="colorbutton"
+  onClick={async () => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+      const res = await fetch(
+        "https://localhost:7042/api/Client/Add",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(nuevoCliente),
+        }
+      );
+
+      if (!res.ok) {
+        const errorText = await res.text(); // <- lectura segura del error
+        throw new Error(errorText);
+      }
+
+      const nuevo = await res.json(); // <- solo si la respuesta es JSON
+      showPopup("Cliente creado correctamente");
+      await fetchClientesYDeliverys();
+setClienteSeleccionado(nuevo.idCliente);
+      setMostrarFormularioCliente(false);
+      setNuevoCliente({
+        nombre: "",
+        apellido: "",
+        direccion1: "",
+        telefono: "",
+        esProveedor: false,
+      });
+    } catch (err) {
+      showPopup("Error al crear cliente: " + err.message, "danger");
+    }
+  }}
+>
+  Guardar Cliente
+</Button>
+
+            </Modal.Footer>
+          </Modal>
+          <Card className="shadow mb-4">
+            <Card.Header className="bg-personalized text-white">
+              Horario de Entrega
+            </Card.Header>
+            <Card.Body>
+              <Select
+                options={generarOpcionesHorario()}
+                placeholder="Seleccionar horario..."
+                onChange={(opcion) => setHoraEntrega(opcion.value)}
+                value={
+                  horaEntrega
+                    ? { value: horaEntrega, label: horaEntrega }
+                    : null
+                }
+              />
+            </Card.Body>
+          </Card>
 
           {/* DELIVERY + HORARIO en misma fila (con botones iguales y toggle para delivery) */}
           <Row className="mb-3">
