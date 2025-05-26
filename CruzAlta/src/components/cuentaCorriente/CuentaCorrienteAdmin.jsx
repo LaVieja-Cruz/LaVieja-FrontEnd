@@ -9,10 +9,15 @@ import {
   Modal,
   Row,
   Col,
+  Toast, 
+  ToastContainer
 } from "react-bootstrap";
 import Select from "react-select";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import './CuantaCorriente.css';
+
+
 
 const CuentaCorrienteAdmin = () => {
   const [clientes, setClientes] = useState([]);
@@ -28,6 +33,21 @@ const CuentaCorrienteAdmin = () => {
 
   const [fechaDesde, setFechaDesde] = useState(null);
   const [fechaHasta, setFechaHasta] = useState(null);
+
+  const [montoPago, setMontoPago] = useState("");
+  const [toast, setToast] = useState({
+  show: false,
+  message: "",
+  variant: "success",
+});
+
+const mostrarToast = (message, variant = "success") => {
+  setToast({ show: true, message, variant });
+  setTimeout(() => {
+    setToast({ ...toast, show: false });
+  }, 3000);
+};
+
 
   const baseUrl = "https://localhost:7042/api";
 
@@ -103,10 +123,10 @@ const CuentaCorrienteAdmin = () => {
 
       if (!res.ok) throw new Error("No se pudo crear la cuenta");
 
-      alert("Cuenta creada exitosamente.");
+      mostrarToast("Cuenta creada exitosamente.", "success");
       handleChangeCliente({ target: { value: clienteSeleccionado } });
     } catch (err) {
-      alert("Error: " + err.message);
+     mostrarToast("Error: " + err.message, "danger");
     }
   };
 
@@ -126,7 +146,7 @@ const CuentaCorrienteAdmin = () => {
   const exportarPDF = () => {
     if (!clienteSeleccionado) return;
     if (fechaDesde && fechaHasta && fechaDesde > fechaHasta) {
-      alert("La fecha desde no puede ser mayor a la fecha hasta.");
+      mostrarToast("La fecha desde no puede ser mayor a la fecha hasta.", "danger");
       return;
     }
 
@@ -141,6 +161,40 @@ const CuentaCorrienteAdmin = () => {
       `${baseUrl}/CuentaCorriente/exportar-pdf/${clienteSeleccionado}?${params.toString()}`,
       "_blank"
     );
+  };
+
+  const pagarParcial = async () => {
+    const monto = parseFloat(montoPago);
+    if (isNaN(monto) || monto <= 0) {
+      mostrarToast("Ingrese un monto válido.", "danger");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("jwtToken");
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+
+      const res = await fetch(
+        `${baseUrl}/CuentaCorriente/pagar-parcial/${clienteSeleccionado}`,
+        {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ monto }),
+        }
+      );
+
+      if (!res.ok) throw new Error("No se pudo registrar el pago.");
+
+      mostrarToast("Pago registrado correctamente.", "success");
+      setMontoPago("");
+      handleChangeCliente({ target: { value: clienteSeleccionado } });
+    } catch (err) {
+      mostrarToast("Error: " + err.message, "danger");
+
+    }
   };
 
   return (
@@ -186,7 +240,7 @@ const CuentaCorrienteAdmin = () => {
       )}
 
       {tieneCuenta && movimientos.length > 0 && (
-        <Button variant="info" className="mb-3" onClick={calcularResumen}>
+        <Button  className="mb-3 buttoncolor" onClick={calcularResumen}>
           Ver Resumen
         </Button>
       )}
@@ -223,7 +277,12 @@ const CuentaCorrienteAdmin = () => {
       )}
 
       {/* Modal Resumen */}
-      <Modal show={mostrarResumen} onHide={() => setMostrarResumen(false)} size="lg" centered>
+      <Modal
+        show={mostrarResumen}
+        onHide={() => setMostrarResumen(false)}
+        size="lg"
+        centered
+      >
         <Modal.Header closeButton>
           <Modal.Title>Resumen de Cuenta Corriente</Modal.Title>
         </Modal.Header>
@@ -255,6 +314,7 @@ const CuentaCorrienteAdmin = () => {
               </Button>
             </Col>
           </Row>
+
           <Table bordered>
             <thead>
               <tr>
@@ -288,6 +348,26 @@ const CuentaCorrienteAdmin = () => {
               </tr>
             </tfoot>
           </Table>
+
+          {saldo > 0 && (
+            <Row className="mt-4">
+              <Col md={4}>
+                <Form.Control
+                  type="number"
+                  placeholder="Monto a pagar"
+                  value={montoPago}
+                  onChange={(e) => setMontoPago(e.target.value)}
+                  min="0"
+                  step="0.01"
+                />
+              </Col>
+              <Col md="auto">
+                <Button className="buttoncolor" onClick={pagarParcial}>
+                  Registrar Pago
+                </Button>
+              </Col>
+            </Row>
+          )}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setMostrarResumen(false)}>
@@ -296,7 +376,20 @@ const CuentaCorrienteAdmin = () => {
         </Modal.Footer>
       </Modal>
     </Container>
+    
   );
+  <ToastContainer position="bottom-end" className="p-3">
+  <Toast
+    bg={toast.variant}
+    onClose={() => setToast({ ...toast, show: false })}
+    show={toast.show}
+    delay={3000}
+    autohide
+  >
+    <Toast.Body className="text-white">{toast.message}</Toast.Body>
+  </Toast>
+</ToastContainer>
+
 };
 
 export default CuentaCorrienteAdmin;

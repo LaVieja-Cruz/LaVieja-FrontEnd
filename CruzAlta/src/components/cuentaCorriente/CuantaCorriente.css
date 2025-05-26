@@ -1,0 +1,21 @@
+.buttoncolor {
+    background-color: #901C1C !important;
+    color: #ffffff;
+    border: none; /* Elimina el borde predeterminado */
+    transition: all 0.3s ease;
+  }
+  
+  .buttoncolor:focus,
+  .buttoncolor:active,
+  .buttoncolor:focus-visible {
+    outline: none !important;  /* Elimina el contorno */
+    box-shadow: none !important; /* Elimina cualquier sombra aplicada al foco */
+    border: none !important; /* Asegura que no haya borde visible */
+
+  }
+  
+  .buttoncolor:hover {
+    background-color: #ffffff;
+    color: #901C1C;
+    border: 1px solid #901C1C ; /* Opcional: Agregar borde cuando está en hover */
+  }
