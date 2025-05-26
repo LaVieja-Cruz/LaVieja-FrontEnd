@@ -36,11 +36,22 @@ const Pedidos = () => {
     telefono: "",
     esProveedor: false,
   });
-  const [mostrarFormularioCliente, setMostrarFormularioCliente] = useState(false);
-  const [notaModal, setNotaModal] = useState({ show: false, index: null, nota: "" });
-  const [popup, setPopup] = useState({ show: false, message: "", variant: "success" });
-
-  const { role } = useAuth();
+  const [mostrarFormularioCliente, setMostrarFormularioCliente] =
+    useState(false);
+  const [notaModal, setNotaModal] = useState({
+    show: false,
+    index: null,
+    nota: "",
+  });
+  const [popup, setPopup] = useState({
+    show: false,
+    message: "",
+    variant: "success",
+  });
+  const [modalDireccionesVisible, setModalDireccionesVisible] = useState(false);
+  const [direccionesCliente, setDireccionesCliente] = useState([]);
+  const [direccionSeleccionada, setDireccionSeleccionada] = useState(null);
+  const [nuevaDireccion, setNuevaDireccion] = useState("");
 
   const generarOpcionesHorario = () => {
     const opciones = [];
@@ -92,52 +103,56 @@ const Pedidos = () => {
   };
 
   const fetchClientesYDeliverys = async () => {
-  const token = localStorage.getItem("jwtToken");
+    const token = localStorage.getItem("jwtToken");
 
-  // 1. Obtener clientes normales
-  const resClientes = await fetch("https://localhost:7042/api/Client/GetAll", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  });
+    // 1. Obtener clientes normales
+    const resClientes = await fetch(
+      "https://localhost:7042/api/Client/GetAll",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-  if (!resClientes.ok) throw new Error("Error al cargar clientes");
-  const clientesData = await resClientes.json();
-  setClientes(clientesData);
+    if (!resClientes.ok) throw new Error("Error al cargar clientes");
+    const clientesData = await resClientes.json();
+    setClientes(clientesData);
 
-  // 2. Obtener deliverys activos
-  const resDeliverys = await fetch("https://localhost:7042/api/DeliveryActivo", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  });
+    // 2. Obtener deliverys activos
+    const resDeliverys = await fetch(
+      "https://localhost:7042/api/DeliveryActivo",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-  if (!resDeliverys.ok) throw new Error("Error al cargar deliverys activos");
-  const deliverysData = await resDeliverys.json();
+    if (!resDeliverys.ok) throw new Error("Error al cargar deliverys activos");
+    const deliverysData = await resDeliverys.json();
 
-  // 3. Mapeamos para que cada delivery tenga idUsuario y userName
-  const mapped = deliverysData.map(d => ({
-    idUsuario: d.idUsuarioDelivery,
-    userName: d.userName,
-  }));
-  setDeliverys(mapped);
-};
-
+    // 3. Mapeamos para que cada delivery tenga idUsuario y userName
+    const mapped = deliverysData.map((d) => ({
+      idUsuario: d.idUsuarioDelivery,
+      userName: d.userName,
+    }));
+    setDeliverys(mapped);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         const [menusData, comidasData] = await Promise.all([
-        fetchMenus(),
-        fetchComidas(),
-            ]);
-      setMenus(menusData);
-      setComidas(comidasData);
-      await fetchClientesYDeliverys(); // Esto ya hace setClientes y setDeliverys internamente
-
+          fetchMenus(),
+          fetchComidas(),
+        ]);
+        setMenus(menusData);
+        setComidas(comidasData);
+        await fetchClientesYDeliverys(); // Esto ya hace setClientes y setDeliverys internamente
       } catch (err) {
         console.error("Error al cargar datos:", err);
         setError("No se pudieron cargar menús o comidas.");
@@ -150,7 +165,24 @@ const Pedidos = () => {
 
   const agregarAlPedido = (item) => {
     if (!item || typeof item.precio !== "number") return;
+
     setPedido((prev) => [...prev, item]);
+
+    if (item.tipo === "comida") {
+      setComidas((prev) =>
+        prev.map((c) =>
+          c.idComida === item.id && c.stock > 0
+            ? { ...c, stock: c.stock - 1 }
+            : c
+        )
+      );
+    } else if (item.tipo === "menu") {
+      setMenus((prev) =>
+        prev.map((m) =>
+          m.idMenu === item.id && m.stock > 0 ? { ...m, stock: m.stock - 1 } : m
+        )
+      );
+    }
   };
 
   const eliminarDelPedido = (index) => {
@@ -186,19 +218,20 @@ const Pedidos = () => {
     fechaEntrega.setHours(parseInt(h), parseInt(m), 0, 0);
 
     const dto = {
-      FechaPedido: now.toISOString(),
-      HoraPedido: now.toISOString(),
-      HoraEntrega: fechaEntrega.toISOString(),
-      idCliente: clienteSeleccionado,
-      DeliveryIdUsuario: deliverySeleccionado,
-      Estado: 0,
-      MetodoEntrega: 1,
-      detallesPedidos: pedido.map((item) => ({
-        idMenu: item.tipo === "menu" ? item.id : null,
-        idComida: item.tipo === "comida" ? item.id : null,
-        nota: item.nota || "",
-      })),
-    };
+  FechaPedido: now.toISOString(),
+  HoraPedido: now.toISOString(),
+  HoraEntrega: fechaEntrega.toISOString(),
+  idCliente: clienteSeleccionado,
+  DeliveryIdUsuario: deliverySeleccionado,
+  direccionEntrega: direccionSeleccionada,
+  Estado: 0,
+  MetodoEntrega: 1,
+  detallesPedidos: pedido.map((item) => ({
+    idMenu: item.tipo === "menu" ? item.id : null,
+    idComida: item.tipo === "comida" ? item.id : null,
+    nota: item.nota || "",
+  })),
+};
 
     try {
       const token = localStorage.getItem("jwtToken");
@@ -240,7 +273,9 @@ const Pedidos = () => {
     setNotaModal({ show: false, index: null, nota: "" });
   };
 
-  const comidasActivas = comidas.filter((c) => c.activo === true || c.activo === 1);
+  const comidasActivas = comidas.filter(
+    (c) => c.activo === true || c.activo === 1
+  );
   const menusActivos = menus.filter((m) => m.activo === true || m.activo === 1);
 
   if (loading)
@@ -256,6 +291,27 @@ const Pedidos = () => {
         <Alert variant="danger">{error}</Alert>
       </Container>
     );
+
+  const cargarDireccionesCliente = async (idCliente) => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+      const res = await fetch(
+        `https://localhost:7042/api/Client/${idCliente}/direcciones`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!res.ok) throw new Error("Error al obtener direcciones");
+      const data = await res.json();
+      setDireccionesCliente(data);
+    } catch (err) {
+      showPopup("No se pudieron cargar las direcciones", "danger");
+    }
+  };
 
   return (
     <Container fluid>
@@ -277,6 +333,7 @@ const Pedidos = () => {
                         nombre: menu.nombre,
                         precio: menu.precio ?? 0,
                         imagenUrl: menu.imagenUrl,
+                        stock: menu.stock,
                       }}
                       onAgregarAlPedido={() =>
                         agregarAlPedido({
@@ -301,13 +358,20 @@ const Pedidos = () => {
             <Card.Body>
               <Row>
                 {comidasActivas.map((comida) => (
-                  <Col key={comida.idComida} xs={12} md={6} lg={4} className="mb-3">
+                  <Col
+                    key={comida.idComida}
+                    xs={12}
+                    md={6}
+                    lg={4}
+                    className="mb-3"
+                  >
                     <ItemCard
                       item={{
                         id: comida.idComida,
                         nombre: comida.comida,
                         precio: comida.precio ?? 0,
                         imagenUrl: comida.imagenUrl,
+                        stock: comida.stock,
                       }}
                       onAgregarAlPedido={() =>
                         agregarAlPedido({
@@ -330,7 +394,9 @@ const Pedidos = () => {
           <Row className="mb-3">
             <Col xs={12}>
               <Card className="shadow">
-                <Card.Header className="bg-personalized text-white">Cliente</Card.Header>
+                <Card.Header className="bg-personalized text-white">
+                  Cliente
+                </Card.Header>
                 <Card.Body>
                   <Select
                     options={[
@@ -348,6 +414,8 @@ const Pedidos = () => {
                       } else {
                         setClienteSeleccionado(option.value);
                         setMostrarFormularioCliente(false);
+                        cargarDireccionesCliente(option.value);
+                        setModalDireccionesVisible(true);
                       }
                     }}
                     value={
@@ -363,7 +431,7 @@ const Pedidos = () => {
               </Card>
             </Col>
           </Row>
-                   {/* Modal crear cliente */}
+          {/* Modal crear cliente */}
           <Modal
             show={mostrarFormularioCliente}
             onHide={() => setMostrarFormularioCliente(false)}
@@ -403,84 +471,146 @@ const Pedidos = () => {
                 Cancelar
               </Button>
               <Button
-  className="colorbutton"
-  onClick={async () => {
-    try {
-      const token = localStorage.getItem("jwtToken");
-      const res = await fetch(
-        "https://localhost:7042/api/Client/Add",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(nuevoCliente),
-        }
-      );
+                className="colorbutton"
+                onClick={async () => {
+                  try {
+                    const token = localStorage.getItem("jwtToken");
+                    const res = await fetch(
+                      "https://localhost:7042/api/Client/Add",
+                      {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                          Authorization: `Bearer ${token}`,
+                        },
+                        body: JSON.stringify(nuevoCliente),
+                      }
+                    );
 
-      if (!res.ok) {
-        const errorText = await res.text(); // <- lectura segura del error
-        throw new Error(errorText);
-      }
+                    if (!res.ok) {
+                      const errorText = await res.text(); // <- lectura segura del error
+                      throw new Error(errorText);
+                    }
 
-      const nuevo = await res.json(); // <- solo si la respuesta es JSON
-      showPopup("Cliente creado correctamente");
-      await fetchClientesYDeliverys();
-setClienteSeleccionado(nuevo.idCliente);
-      setMostrarFormularioCliente(false);
-      setNuevoCliente({
-        nombre: "",
-        apellido: "",
-        direccion1: "",
-        telefono: "",
-        esProveedor: false,
-      });
-    } catch (err) {
-      showPopup("Error al crear cliente: " + err.message, "danger");
-    }
-  }}
->
-  Guardar Cliente
-</Button>
-
+                    const nuevo = await res.json(); // <- solo si la respuesta es JSON
+                    showPopup("Cliente creado correctamente");
+                    await fetchClientesYDeliverys();
+                    setClienteSeleccionado(nuevo.idCliente);
+                    setMostrarFormularioCliente(false);
+                    setNuevoCliente({
+                      nombre: "",
+                      apellido: "",
+                      direccion1: "",
+                      telefono: "",
+                      esProveedor: false,
+                    });
+                  } catch (err) {
+                    showPopup(
+                      "Error al crear cliente: " + err.message,
+                      "danger"
+                    );
+                  }
+                }}
+              >
+                Guardar Cliente
+              </Button>
             </Modal.Footer>
           </Modal>
-          <Card className="shadow mb-4">
-            <Card.Header className="bg-personalized text-white">
-              Horario de Entrega
-            </Card.Header>
-            <Card.Body>
-              <Select
-                options={generarOpcionesHorario()}
-                placeholder="Seleccionar horario..."
-                onChange={(opcion) => setHoraEntrega(opcion.value)}
-                value={
-                  horaEntrega
-                    ? { value: horaEntrega, label: horaEntrega }
-                    : null
-                }
-              />
-            </Card.Body>
-          </Card>
+          <Modal
+  show={modalDireccionesVisible}
+  onHide={() => setModalDireccionesVisible(false)}
+  centered
+>
+  <Modal.Header closeButton>
+    <Modal.Title>Direcciones del Cliente</Modal.Title>
+  </Modal.Header>
+  <Modal.Body>
+    <Form.Group>
+      <Form.Label>Direcciones registradas:</Form.Label>
+      <div className="mb-2">
+        {direccionesCliente.length > 0 ? (
+          direccionesCliente.map((dir, idx) => (
+            <Form.Check
+              key={idx}
+              type="radio"
+              name="direccion"
+              label={dir}
+              value={dir}
+              checked={direccionSeleccionada === dir}
+              onChange={() => setDireccionSeleccionada(dir)}
+            />
+          ))
+        ) : (
+          <p className="text-muted">No hay direcciones registradas.</p>
+        )}
+      </div>
+    </Form.Group>
+
+    <hr />
+
+    <Form.Group className="mt-2">
+      <Form.Label>Agregar nueva dirección:</Form.Label>
+      <Form.Control
+        type="text"
+        placeholder="Nueva dirección"
+        value={nuevaDireccion}
+        onChange={(e) => setNuevaDireccion(e.target.value)}
+      />
+      <Button
+        className="mt-2 colorbutton"
+        onClick={() => {
+          if (nuevaDireccion.trim() !== "") {
+            const nuevas = [...direccionesCliente, nuevaDireccion.trim()];
+            setDireccionesCliente(nuevas);
+            setDireccionSeleccionada(nuevaDireccion.trim());
+            setNuevaDireccion("");
+          }
+        }}
+      >
+        Añadir dirección
+      </Button>
+    </Form.Group>
+  </Modal.Body>
+  <Modal.Footer>
+    <Button
+      variant="secondary"
+      onClick={() => setModalDireccionesVisible(false)}
+    >
+      Cancelar
+    </Button>
+    <Button
+      className="colorbutton"
+      onClick={() => setModalDireccionesVisible(false)}
+      disabled={!direccionSeleccionada}
+    >
+      Confirmar dirección
+    </Button>
+  </Modal.Footer>
+</Modal>
+
 
           {/* DELIVERY + HORARIO en misma fila (con botones iguales y toggle para delivery) */}
           <Row className="mb-3">
             <Col md={6}>
               <Card className="shadow h-100">
-                <Card.Header className="bg-personalized text-white">Delivery</Card.Header>
+                <Card.Header className="bg-personalized text-white">
+                  Delivery
+                </Card.Header>
                 <Card.Body className="d-flex justify-content-center align-items-center">
-                  <div className="btn-group w-100" role="group">
+                  <div className="d-flex flex-wrap gap-2 justify-content-center w-100">
                     {deliverys.map((d) => (
-                  <button
-                    key={d.idUsuario}
-                    type="button"
-                    className={`btn btn-delivery ${deliverySeleccionado === d.idUsuario ? "selected" : ""}`}
-                    onClick={() => setDeliverySeleccionado(d.idUsuario)}
-                  >
-                    {d.userName}
-                  </button>
-                ))}
+                      <button
+                        key={d.idUsuario}
+                        type="button"
+                        className={`btn btn-delivery ${
+                          deliverySeleccionado === d.idUsuario ? "selected" : ""
+                        }`}
+                        onClick={() => setDeliverySeleccionado(d.idUsuario)}
+                        style={{ minWidth: "100px", flex: "1 1 auto" }}
+                      >
+                        {d.userName}
+                      </button>
+                    ))}
                   </div>
                 </Card.Body>
               </Card>
@@ -488,14 +618,20 @@ setClienteSeleccionado(nuevo.idCliente);
 
             <Col md={6}>
               <Card className="shadow h-100">
-                <Card.Header className="bg-personalized text-white">Horario de Entrega</Card.Header>
+                <Card.Header className="bg-personalized text-white">
+                  Horario de Entrega
+                </Card.Header>
                 <Card.Body className="d-flex align-items-center">
                   <div className="w-100">
                     <Select
                       options={generarOpcionesHorario()}
                       placeholder="Seleccionar horario..."
                       onChange={(option) => setHoraEntrega(option?.value)}
-                      value={horaEntrega ? { value: horaEntrega, label: horaEntrega } : null}
+                      value={
+                        horaEntrega
+                          ? { value: horaEntrega, label: horaEntrega }
+                          : null
+                      }
                     />
                   </div>
                 </Card.Body>
@@ -503,13 +639,16 @@ setClienteSeleccionado(nuevo.idCliente);
             </Col>
           </Row>
 
-
           {/* Resumen del Pedido */}
           <Card className="shadow">
-            <Card.Header className="bg-personalized text-white">Resumen del Pedido</Card.Header>
+            <Card.Header className="bg-personalized text-white">
+              Resumen del Pedido
+            </Card.Header>
             <Card.Body style={{ maxHeight: "500px", overflowY: "auto" }}>
               {pedido.length === 0 ? (
-                <p className="text-muted">No hay comidas ni menús en el pedido.</p>
+                <p className="text-muted">
+                  No hay comidas ni menús en el pedido.
+                </p>
               ) : (
                 <ListGroup>
                   {pedido.map((item, idx) => (
@@ -518,18 +657,26 @@ setClienteSeleccionado(nuevo.idCliente);
                       className="d-flex justify-content-between align-items-center"
                     >
                       <div>
-                        <strong>{item.nombre}</strong> (${item.precio.toFixed(2)})
+                        <strong>{item.nombre}</strong> ($
+                        {item.precio.toFixed(2)})
                       </div>
                       <div className="d-flex gap-2">
-                        <Button size="sm" onClick={() => agregarNota(idx)} className="colorbutton">
+                        <Button
+                          size="sm"
+                          onClick={() => agregarNota(idx)}
+                          className="colorbutton"
+                        >
                           Nota
                         </Button>
-                        <Button size="sm" onClick={() => eliminarDelPedido(idx)} className="colorbutton">
+                        <Button
+                          size="sm"
+                          onClick={() => eliminarDelPedido(idx)}
+                          className="colorbutton"
+                        >
                           ×
                         </Button>
                       </div>
                     </ListGroup.Item>
-
                   ))}
                 </ListGroup>
               )}
@@ -566,7 +713,9 @@ setClienteSeleccionado(nuevo.idCliente);
             delay={2000}
             autohide
           >
-            <Toast.Body className="text-white text-center">{popup.message}</Toast.Body>
+            <Toast.Body className="text-white text-center">
+              {popup.message}
+            </Toast.Body>
           </Toast>
         </div>
       )}
@@ -595,7 +744,10 @@ setClienteSeleccionado(nuevo.idCliente);
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setNotaModal({ show: false, index: null, nota: "" })}>
+          <Button
+            variant="secondary"
+            onClick={() => setNotaModal({ show: false, index: null, nota: "" })}
+          >
             Cancelar
           </Button>
           <Button className="colorbutton" onClick={guardarNota}>

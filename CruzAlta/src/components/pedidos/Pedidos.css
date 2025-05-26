@@ -26,3 +26,11 @@
   border-color: #ffffff !important;
   color: white !important;
 }
+
+.colorbutton:disabled {
+  background-color: white !important;
+  color: #901C1C !important;
+  border: 1px solid #901C1C !important;
+  cursor: not-allowed;
+  opacity: 1; /* Quitar el efecto gris por defecto de Bootstrap */
+}

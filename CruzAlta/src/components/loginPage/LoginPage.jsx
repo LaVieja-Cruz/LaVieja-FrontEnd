@@ -73,16 +73,6 @@ const LoginPage = () => {
           </div>
         )}
 
-        <div className="d-flex align-items-center my-4">
-          <hr className="flex-grow-1" />
-          <span className="mx-2 text-muted">O conéctese con</span>
-          <hr className="flex-grow-1" />
-        </div>
-
-        <div className="d-flex justify-content-center gap-4 mb-4 fs-4">
-  <FontAwesomeIcon icon={faGoogle} className="colortxt social-icon" />
-  <FontAwesomeIcon icon={faFacebookF} className="colortxt social-icon" />
-</div>
 
 
         <div className="colortxt text-center">
