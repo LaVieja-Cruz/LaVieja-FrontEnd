@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
+import {
+  Container,
+  Table,
+  Spinner,
+  Alert,
+  Button
+} from "react-bootstrap";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Table, Container, Spinner, Alert, Button } from "react-bootstrap";
 
 const DetalleCaja = () => {
   const [searchParams] = useSearchParams();
@@ -39,7 +45,6 @@ const DetalleCaja = () => {
         }
 
         const data = await response.json();
-
         if (!data || !data.movimientos) {
           setCajaInexistente(true);
           return;
@@ -58,9 +63,16 @@ const DetalleCaja = () => {
     if (fecha) fetchMovimientos();
   }, [fecha]);
 
+  const exportarPDF = () => {
+    window.open(
+      `https://localhost:7042/api/Caja/exportar-resumen-dia?fecha=${fecha}`,
+      "_blank"
+    );
+  };
+
   return (
     <Container className="mt-4">
-      <h2>Detalle de Caja</h2>
+      <h3>Detalle de Caja</h3>
       <p className="text-muted">Fecha: {new Date(fecha).toLocaleDateString()}</p>
 
       {loading && (
@@ -79,17 +91,13 @@ const DetalleCaja = () => {
 
       {!loading && !error && !cajaInexistente && (
         <>
-          <Alert variant="info">
-            <strong>Totales:</strong> Ingresos: ${ingresos.toFixed(2)} | Egresos: ${egresos.toFixed(2)} | Neto: {(ingresos - egresos).toFixed(2)}
-          </Alert>
-
-          <Table bordered hover>
+          <Table bordered>
             <thead className="table-dark">
               <tr>
                 <th>Fecha/Hora</th>
                 <th>Concepto</th>
-                <th>Tipo</th>
-                <th>Monto</th>
+                <th>Debe</th>
+                <th>Haber</th>
               </tr>
             </thead>
             <tbody>
@@ -104,17 +112,37 @@ const DetalleCaja = () => {
                   <tr key={idx}>
                     <td>{new Date(mov.fecha).toLocaleString()}</td>
                     <td>{mov.concepto}</td>
-                    <td>{mov.esIngreso ? "Ingreso" : "Egreso"}</td>
-                    <td>${mov.monto.toFixed(2)}</td>
+                    <td>{!mov.esIngreso ? `$${mov.monto.toFixed(2)}` : "-"}</td>
+                    <td>{mov.esIngreso ? `$${mov.monto.toFixed(2)}` : "-"}</td>
                   </tr>
                 ))
               )}
             </tbody>
+            <tfoot>
+              <tr>
+                <th colSpan={2}>Totales</th>
+                <th>${egresos.toFixed(2)}</th>
+                <th>${ingresos.toFixed(2)}</th>
+              </tr>
+              <tr>
+                <th colSpan={2}>Saldo final</th>
+                <th colSpan={2} className={(ingresos - egresos) >= 0 ? "text-success" : "text-danger"}>
+                  ${ (ingresos - egresos).toFixed(2) }
+                </th>
+              </tr>
+            </tfoot>
           </Table>
+
+          <div className="d-flex justify-content-between mt-4">
+            <Button variant="secondary" onClick={() => navigate("/admin/caja")}>
+              Volver a Caja
+            </Button>
+            <Button variant="primary" onClick={exportarPDF}>
+              Exportar PDF
+            </Button>
+          </div>
         </>
       )}
-
-      <Button variant="secondary" onClick={() => navigate("/admin/caja")}>Volver a Caja</Button>
     </Container>
   );
 };

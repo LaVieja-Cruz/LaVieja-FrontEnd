@@ -197,6 +197,11 @@ const mostrarToast = (message, variant = "success") => {
     }
   };
 
+  const clienteOptions = clientes.map((c) => ({
+  value: c.idCliente,
+  label: `${c.nombre} ${c.apellido}`,
+}));
+
   return (
     <Container className="mt-4">
       <h3>Cuenta Corriente de Clientes</h3>
@@ -204,19 +209,15 @@ const mostrarToast = (message, variant = "success") => {
       <Form.Group controlId="clienteSelect" className="my-3">
         <Form.Label>Seleccionar cliente</Form.Label>
         <Select
-          value={
-            clientes.find((c) => c.idCliente === clienteSeleccionado) || null
-          }
-          onChange={(opcion) =>
-            handleChangeCliente({ target: { value: opcion.value } })
-          }
-          options={clientes.map((c) => ({
-            value: c.idCliente,
-            label: `${c.nombre} ${c.apellido}`,
-          }))}
-          placeholder="-- Seleccione --"
-          isClearable
-        />
+  value={clienteOptions.find((opt) => opt.value === clienteSeleccionado) || null}
+  onChange={(opcion) =>
+    handleChangeCliente({ target: { value: opcion.value } })
+  }
+  options={clienteOptions}
+  placeholder="-- Seleccione --"
+  isClearable
+/>
+
       </Form.Group>
 
       {loading && <Spinner animation="border" />}
@@ -349,7 +350,7 @@ const mostrarToast = (message, variant = "success") => {
             </tfoot>
           </Table>
 
-          {saldo > 0 && (
+          {saldo < 0 && (
             <Row className="mt-4">
               <Col md={4}>
                 <Form.Control
@@ -375,10 +376,12 @@ const mostrarToast = (message, variant = "success") => {
           </Button>
         </Modal.Footer>
       </Modal>
-    </Container>
     
-  );
-  <ToastContainer position="bottom-end" className="p-3">
+  <ToastContainer
+  position="top-center"
+  className="p-3"
+  style={{ zIndex: 9999, position: "fixed" }}
+>
   <Toast
     bg={toast.variant}
     onClose={() => setToast({ ...toast, show: false })}
@@ -390,6 +393,9 @@ const mostrarToast = (message, variant = "success") => {
   </Toast>
 </ToastContainer>
 
+</Container>
+    
+  );
 };
 
 export default CuentaCorrienteAdmin;
