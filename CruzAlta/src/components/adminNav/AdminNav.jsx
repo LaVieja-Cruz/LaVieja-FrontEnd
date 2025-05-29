@@ -20,6 +20,7 @@ const AdminNav = () => {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
           <Nav className="ml-auto align-items-center">
+            <Nav.Link className= "colortxt " href="/admin/Admincocina">Cocinaadmin</Nav.Link>
             <Nav.Link className= "colortxt " href="/admin/cocina">Cocina</Nav.Link>
             <Nav.Link className="colortxt" href="/admin/stock">Stocks</Nav.Link>
             <Nav.Link className="colortxt" href="/admin/cuenta-corriente">CtaCTE Admin</Nav.Link>

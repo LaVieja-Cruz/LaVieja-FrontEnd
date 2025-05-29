@@ -24,7 +24,7 @@ import CuentaCorrienteAdmin from './components/cuentaCorriente/CuentaCorrienteAd
 import StockManager from './components/stockManager/StockManager';
 import ProveedorComprasPage from "./components/proveedores/ProveedorComprasPage";
 import CocinaPage from "./components/cocina/CocinaPage";
-
+import AdminCocinaPage from "./components/cocina/AdminCocinaPage";
 
 function App() {
   const router = createBrowserRouter([
@@ -173,6 +173,15 @@ function App() {
       (
         <Layout>
           <CocinaPage/>
+        </Layout>
+      )
+      },
+      {
+      path: "admin/Admincocina",
+      element: 
+      (
+        <Layout>
+          <AdminCocinaPage/>
         </Layout>
       )
       }

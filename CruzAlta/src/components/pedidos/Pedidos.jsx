@@ -17,6 +17,7 @@ import ItemCard from "../itemCard/ItemCard";
 import { FaShoppingCart } from "react-icons/fa";
 import "./Pedidos.css";
 import Select from "react-select";
+import { useNavigate } from "react-router-dom";
 
 const Pedidos = () => {
   const [comidas, setComidas] = useState([]);
@@ -52,6 +53,7 @@ const Pedidos = () => {
   const [direccionesCliente, setDireccionesCliente] = useState([]);
   const [direccionSeleccionada, setDireccionSeleccionada] = useState(null);
   const [nuevaDireccion, setNuevaDireccion] = useState("");
+  const navigate = useNavigate();
 
   const generarOpcionesHorario = () => {
     const opciones = [];
@@ -214,13 +216,17 @@ const Pedidos = () => {
 
     const now = new Date();
     const [h, m] = horaEntrega.split(":");
+
+    // 🛠️ Creamos la fecha de entrega como hoy con hora seleccionada
     const fechaEntrega = new Date();
     fechaEntrega.setHours(parseInt(h), parseInt(m), 0, 0);
 
+    // ✅ Usamos .toLocaleString('sv-SE') para obtener formato ISO con HORA LOCAL
+    // 'sv-SE' da algo como: "2025-05-29 20:00:00", lo transformamos a "2025-05-29T20:00:00"
     const dto = {
-      FechaPedido: now.toISOString(),
-      HoraPedido: now.toISOString(),
-      HoraEntrega: fechaEntrega.toISOString(),
+      FechaPedido: now.toLocaleString("sv-SE").replace(" ", "T"), // ✅ conserva hora local
+      HoraPedido: now.toLocaleString("sv-SE").replace(" ", "T"), // ✅ igual que arriba
+      HoraEntrega: fechaEntrega.toLocaleString("sv-SE").replace(" ", "T"), // ✅ evita UTC
       idCliente: clienteSeleccionado,
       DeliveryIdUsuario: deliverySeleccionado,
       direccionEntrega: direccionSeleccionada,
@@ -248,6 +254,7 @@ const Pedidos = () => {
 
       showPopup("Pedido cargado con éxito", "success");
       setPedido([]);
+      navigate("/admin/Admincocina");
     } catch (err) {
       console.error(err);
       showPopup("Error al cargar el pedido: " + err.message, "danger");
