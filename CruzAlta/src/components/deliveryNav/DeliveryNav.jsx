@@ -2,7 +2,7 @@
 import { Navbar, Container, Nav, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import './deliveryNav.css'
+import './DeliveryNav.css'
 
 const DeliveryNav = () => {
   const { logout } = useAuth();
