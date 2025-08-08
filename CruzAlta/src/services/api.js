@@ -1,4 +1,4 @@
-const API_URL = "https://localhost:7042/api"; // <-- PONER EL PUERTO DE CADA UNO DEL BACK
+const API_URL = `${import.meta.env.VITE_API_URL}/api`; // <-- PONER EL PUERTO DE CADA UNO DEL BACK
 
 export const authenticateUser = async (email, password) => {
   try {
