@@ -11,7 +11,7 @@ const ProveedorComprasPage = () => {
   useEffect(() => {
     const fetchCompras = async () => {
       try {
-        const res = await fetch(`https://localhost:7042/api/Proveedor/detalles/${idProveedor}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/Proveedor/detalles/${idProveedor}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`, // si usás JWT
           },

@@ -87,8 +87,8 @@ const [nuevaComida, setNuevaComida] = useState({
 
       try {
         const [comidasRes, menusRes] = await Promise.all([
-          fetch("https://localhost:7042/api/Comidas/GetAll", { headers }),
-          fetch("https://localhost:7042/api/Menus", { headers }),
+          fetch(`${import.meta.env.VITE_API_URL}/api/Comidas/GetAll`, { headers }),
+          fetch(`${import.meta.env.VITE_API_URL}/api/Menus`, { headers }),
         ]);
 
         const comidasData = comidasRes.ok ? await comidasRes.json() : [];
@@ -129,8 +129,8 @@ const [nuevaComida, setNuevaComida] = useState({
     const body = JSON.stringify({ id, nuevoStock });
     const endpoint =
       tipo === "comida"
-        ? `https://localhost:7042/api/Comidas/actualizar-stock/${id}`
-        : `https://localhost:7042/api/Menus/actualizar-stock/${id}`;
+        ? `${import.meta.env.VITE_API_URL}/api/Comidas/actualizar-stock/${id}`
+        : `${import.meta.env.VITE_API_URL}/api/Menus/actualizar-stock/${id}`;
 
     try {
       const resp = await fetch(endpoint, { method: "PUT", headers, body });
@@ -156,8 +156,8 @@ const [nuevaComida, setNuevaComida] = useState({
 
   const endpoint =
     tipo === "comida"
-      ? `https://localhost:7042/api/Comidas/Delete/${id}`
-      : `https://localhost:7042/api/Menus/${id}`;;
+      ? `${import.meta.env.VITE_API_URL}/api/Comidas/Delete/${id}`
+      : `${import.meta.env.VITE_API_URL}/api/Menus/${id}`;;
 
   try {
     const resp = await fetch(endpoint, { method: "DELETE", headers });
@@ -166,8 +166,8 @@ const [nuevaComida, setNuevaComida] = useState({
 
       // actualizar data
       const [comidasRes, menusRes] = await Promise.all([
-        fetch("https://localhost:7042/api/Comidas/GetAll", { headers }),
-        fetch("https://localhost:7042/api/Menus", { headers }),
+        fetch(`${import.meta.env.VITE_API_URL}/api/Comidas/GetAl`, { headers }),
+        fetch(`${import.meta.env.VITE_API_URL}/api/Menus`, { headers }),
       ]);
       if (comidasRes.ok) setComidas(await comidasRes.json());
       if (menusRes.ok) setMenus(await menusRes.json());
@@ -189,8 +189,8 @@ const [nuevaComida, setNuevaComida] = useState({
 
     const endpoint =
       tipo === "comida"
-        ? `https://localhost:7042/api/Comidas/toggle-activo/${id}`
-        : `https://localhost:7042/api/Menus/toggle-activo/${id}`;
+        ? `${import.meta.env.VITE_API_URL}/api/Comidas/toggle-activo/${id}`
+        : `${import.meta.env.VITE_API_URL}/api/Menus/toggle-activo/${id}`;
 
     try {
       const resp = await fetch(endpoint, { method: "PUT", headers });
@@ -198,8 +198,8 @@ const [nuevaComida, setNuevaComida] = useState({
         showToast(`${tipo} ${id} ahora está ${!estadoActual ? "activo" : "inactivo"}`, "success");
 
         // recargar data
-        const comidasRes = await fetch("https://localhost:7042/api/Comidas/GetAll", { headers });
-        const menusRes = await fetch("https://localhost:7042/api/Menus", { headers });
+        const comidasRes = await fetch(`${import.meta.env.VITE_API_URL}/api/Comidas/GetAll`, { headers });
+        const menusRes = await fetch(`${import.meta.env.VITE_API_URL}/api/Menus`, { headers });
         if (comidasRes.ok) setComidas(await comidasRes.json());
         if (menusRes.ok) setMenus(await menusRes.json());
       } else {
@@ -224,7 +224,7 @@ const [nuevaComida, setNuevaComida] = useState({
     };
 
     try {
-      const resp = await fetch("https://localhost:7042/api/Menus", {
+      const resp = await fetch(`${import.meta.env.VITE_API_URL}/api/Menus`, {
         method: "POST",
         headers,
         body: JSON.stringify(nuevoMenu),
@@ -234,7 +234,7 @@ const [nuevaComida, setNuevaComida] = useState({
         showToast("Menú creado correctamente", "success");
         setNuevoMenu(formularioMenuVacio);
         setShowModal(false);
-        const menusResp = await fetch("https://localhost:7042/api/Menus", { headers });
+        const menusResp = await fetch(`${import.meta.env.VITE_API_URL}/api/Menus`, { headers });
         if (menusResp.ok) {
           const nuevosMenus = await menusResp.json();
           setMenus(nuevosMenus);
@@ -273,7 +273,7 @@ const [nuevaComida, setNuevaComida] = useState({
   };
 
   try {
-    const resp = await fetch("https://localhost:7042/api/Comidas/Add", {
+    const resp = await fetch(`${import.meta.env.VITE_API_URL}/api/Comidas/Add`, {
       method: "POST",
       headers,
       body: JSON.stringify({
@@ -292,7 +292,7 @@ const [nuevaComida, setNuevaComida] = useState({
       showToast("Comida creada correctamente", "success");
       setNuevaComida(formularioComidaVacio);  
       setShowComidaModal(false);
-      const comidasResp = await fetch("https://localhost:7042/api/Comidas/GetAll", { headers });
+      const comidasResp = await fetch(`${import.meta.env.VITE_API_URL}/api/Comidas/GetAll`, { headers });
       if (comidasResp.ok) setComidas(await comidasResp.json());
     } else {
       showToast("Error al crear comida", "danger");
@@ -587,8 +587,8 @@ const [nuevaComida, setNuevaComida] = useState({
           setShowEditarModal(false);
 
           const [comidasRes, menusRes] = await Promise.all([
-            fetch("https://localhost:7042/api/Comidas/GetAll", { headers }),
-            fetch("https://localhost:7042/api/Menus", { headers }),
+            fetch(`${import.meta.env.VITE_API_URL}/api/Comidas/GetAll`, { headers }),
+            fetch(`${import.meta.env.VITE_API_URL}/api/Menus`, { headers }),
           ]);
 
           const comidasData = comidasRes.ok ? await comidasRes.json() : [];

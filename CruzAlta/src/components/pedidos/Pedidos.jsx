@@ -84,7 +84,7 @@ const Pedidos = () => {
 
   const fetchMenus = async () => {
     const token = localStorage.getItem("jwtToken");
-    const res = await fetch("https://localhost:7042/api/Menus", {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/Menus`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -96,7 +96,7 @@ const Pedidos = () => {
 
   const fetchComidas = async () => {
     const token = localStorage.getItem("token");
-    const res = await fetch("https://localhost:7042/api/Comidas/GetAll", {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/Comidas/GetAll`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -111,7 +111,7 @@ const Pedidos = () => {
 
     // 1. Obtener clientes normales
     const resClientes = await fetch(
-      "https://localhost:7042/api/Client/GetAll",
+      `${import.meta.env.VITE_API_URL}api/Client/GetAll`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -126,7 +126,7 @@ const Pedidos = () => {
 
     // 2. Obtener deliverys activos
     const resDeliverys = await fetch(
-      "https://localhost:7042/api/DeliveryActivo",
+      `${import.meta.env.VITE_API_URL}/api/DeliveryActivo`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -245,7 +245,7 @@ const Pedidos = () => {
 
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch("https://localhost:7042/api/Pedido/Add", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/Pedido/Add`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -307,7 +307,7 @@ const Pedidos = () => {
     try {
       const token = localStorage.getItem("jwtToken");
       const res = await fetch(
-        `https://localhost:7042/api/Client/${idCliente}/direcciones`,
+        `${import.meta.env.VITE_API_URL}/api/Client/${idCliente}/direcciones`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -487,7 +487,7 @@ const Pedidos = () => {
                   try {
                     const token = localStorage.getItem("jwtToken");
                     const res = await fetch(
-                      "https://localhost:7042/api/Client/Add",
+                      `${import.meta.env.VITE_API_URL}/api/Client/Add`,
                       {
                         method: "POST",
                         headers: {
@@ -553,7 +553,7 @@ const Pedidos = () => {
       try {
         const token = localStorage.getItem("jwtToken");
         const res = await fetch(
-          `https://localhost:7042/api/CuentaCorriente/existe/${clienteSeleccionado}`,
+          `${import.meta.env.VITE_API_URL}/api/CuentaCorriente/existe/${clienteSeleccionado}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

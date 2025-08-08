@@ -9,7 +9,7 @@ const CocinaPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const apiUrl = "https://localhost:7042/api/Pedido/cocina";
+
 
   useEffect(() => {
     fetchPedidos();
@@ -17,7 +17,7 @@ const CocinaPage = () => {
 
   const fetchPedidos = async () => {
     try {
-      const res = await axios.get(apiUrl, {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/Pedido/cocina`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
         }

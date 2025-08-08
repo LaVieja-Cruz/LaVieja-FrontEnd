@@ -10,7 +10,7 @@ const DeliveryPedidosPage = () => {
 
   const fetchPedidos = async () => {
     try {
-      const res = await fetch(`https://localhost:7042/api/PedidoDelivery/${user.id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/PedidoDelivery/${user.id}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -36,7 +36,7 @@ const DeliveryPedidosPage = () => {
   const marcarEntregado = async (idPedido) => {
   try {
     setLoading(true); // opcional: mostrar spinner
-    const response = await fetch(`https://localhost:7042/api/PedidoDelivery/entregar/${idPedido}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/PedidoDelivery/entregar/${idPedido}`, {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${user.token}`,

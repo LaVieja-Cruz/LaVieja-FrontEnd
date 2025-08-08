@@ -25,7 +25,7 @@ const ProveedoresPage = () => {
     const fetchProveedores = async () => {
       try {
         const token = localStorage.getItem("jwtToken");
-        const res = await fetch("https://localhost:7042/api/Proveedor", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/Proveedor`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -137,7 +137,7 @@ const ProveedoresPage = () => {
 
                           try {
                             const token = localStorage.getItem("jwtToken");
-                            const res = await fetch(`https://localhost:7042/api/Proveedor/${p.idProveedor}`, {
+                            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/Proveedor/${p.idProveedor}`, {
                               method: "DELETE",
                               headers: {
                                 Authorization: `Bearer ${token}`,

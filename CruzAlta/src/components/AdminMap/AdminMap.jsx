@@ -22,7 +22,8 @@ const AdminMap = () => {
 });
   const fetchLocations = async () => {
     try {
-      const res = await axios.get("https://localhost:7042/api/ubicacion/all", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/ubicacion/all`, {
+
         headers: {
           Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
         }

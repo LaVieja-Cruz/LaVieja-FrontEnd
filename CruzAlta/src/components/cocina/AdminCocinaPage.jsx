@@ -9,9 +9,7 @@ const AdminCocinaPage = () => {
   const [error, setError] = useState(null);
   const [mensaje, setMensaje] = useState(null);
 
-  const apiUrl = "https://localhost:7042/api/Pedido/cocina";
-  const marcarDetalleListoUrl =
-    "https://localhost:7042/api/Pedido/marcar-detalle-listo"; // NUEVO ENDPOINT
+
 useEffect(() => {
   if (mensaje) {
     const timer = setTimeout(() => {
@@ -28,7 +26,7 @@ useEffect(() => {
 
   const fetchPedidos = async () => {
     try {
-      const res = await axios.get(apiUrl, {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/Pedido/cocina`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
         },
@@ -45,7 +43,7 @@ useEffect(() => {
 
   const marcarDetalleComoListo = async (idDetalle) => {
     try {
-      await axios.put(`${marcarDetalleListoUrl}/${idDetalle}`, null, {
+      await axios.put(`${import.meta.env.VITE_API_URL}/api/marcar-detalle-listo}/${idDetalle}`, null, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
         },

@@ -8,7 +8,7 @@ const CuentaCorrienteCliente = () => {
   const [error, setError] = useState(null);
   const [tieneCuenta, setTieneCuenta] = useState(true);
 
-  const apiMovimientos = "https://localhost:7042/api/CuentaCorriente/movimientos";
+  const apiMovimientos = `${import.meta.env.VITE_API_URL}/api/CuentaCorriente/movimientos`;
 
   useEffect(() => {
     const fetchData = async () => {

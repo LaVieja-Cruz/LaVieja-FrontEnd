@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }) => {
       async (position) => {
         try {
           await axios.post(
-            "https://localhost:7042/api/ubicacion/update",
+            `${import.meta.env.VITE_API_URL}/api/ubicacion/update`,
             {
               latitud: position.coords.latitude,
               longitud: position.coords.longitude,

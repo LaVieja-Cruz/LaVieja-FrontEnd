@@ -23,7 +23,7 @@ const ResumenCaja = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const apiUrl = "https://localhost:7042/api/Caja";
+  const apiUrl = `${import.meta.env.VITE_API_URL}/api/Caja`;
 
   const fetchCaja = async () => {
     try {

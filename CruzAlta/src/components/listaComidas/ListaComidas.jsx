@@ -9,7 +9,7 @@ const ListaComidas = () => {
     const fetchComidas = async () => {
       try {
         const token = localStorage.getItem('jwtToken');
-        const response = await fetch('https://localhost:7042/api/Comidas/GetAll', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/Comidas/GetAll`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

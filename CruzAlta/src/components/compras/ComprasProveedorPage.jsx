@@ -15,7 +15,7 @@ const ComprasProveedorPage = () => {
   useEffect(() => {
     const fetchProveedores = async () => {
       try {
-        const res = await fetch("https://localhost:7042/api/Proveedor", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/Proveedor`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -35,7 +35,7 @@ const ComprasProveedorPage = () => {
     setMensaje(null);
 
     try {
-      const response = await fetch("https://localhost:7042/api/CompraProveedor", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/CompraProveedor`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

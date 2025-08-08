@@ -20,7 +20,7 @@ const DetalleCaja = () => {
   const [error, setError] = useState(null);
   const [cajaInexistente, setCajaInexistente] = useState(false);
 
-  const apiUrl = "https://localhost:7042/api/Caja/dia/por-fecha";
+  const apiUrl = `${import.meta.env.VITE_API_URL}/api/Caja/dia/por-fecha`;
 
   useEffect(() => {
     const fetchMovimientos = async () => {
@@ -65,7 +65,7 @@ const DetalleCaja = () => {
 
   const exportarPDF = () => {
     window.open(
-      `https://localhost:7042/api/Caja/exportar-resumen-dia?fecha=${fecha}`,
+      `${import.meta.env.VITE_API_URL}/api/Caja/exportar-resumen-dia?fecha=${fecha}`,
       "_blank"
     );
   };

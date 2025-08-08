@@ -49,14 +49,13 @@ const mostrarToast = (message, variant = "success") => {
 };
 
 
-  const baseUrl = "https://localhost:7042/api";
 
   useEffect(() => {
     const fetchClientes = async () => {
       try {
         const token = localStorage.getItem("jwtToken");
         const headers = { Authorization: `Bearer ${token}` };
-        const res = await fetch(`${baseUrl}/Client/GetAll`, { headers });
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/Client/GetAll`, { headers });
         const data = await res.json();
         setClientes(data);
       } catch (err) {
@@ -79,11 +78,11 @@ const mostrarToast = (message, variant = "success") => {
       const headers = { Authorization: `Bearer ${token}` };
 
       const resMov = await fetch(
-        `${baseUrl}/CuentaCorriente/movimientos/${idCliente}`,
+        `${import.meta.env.VITE_API_URL}/api/CuentaCorriente/movimientos/${idCliente}`,
         { headers }
       );
       const resSaldo = await fetch(
-        `${baseUrl}/CuentaCorriente/saldo/${idCliente}`,
+        `${import.meta.env.VITE_API_URL}/api/CuentaCorriente/saldo/${idCliente}`,
         { headers }
       );
 
@@ -114,7 +113,7 @@ const mostrarToast = (message, variant = "success") => {
       const headers = { Authorization: `Bearer ${token}` };
 
       const res = await fetch(
-        `${baseUrl}/CuentaCorriente/crear/${clienteSeleccionado}`,
+        `${import.meta.env.VITE_API_URL}/api/CuentaCorriente/crear/${clienteSeleccionado}`,
         {
           method: "POST",
           headers,
@@ -158,7 +157,7 @@ const mostrarToast = (message, variant = "success") => {
     params.append("token", token);
 
     window.open(
-      `${baseUrl}/CuentaCorriente/exportar-pdf/${clienteSeleccionado}?${params.toString()}`,
+      `${import.meta.env.VITE_API_URL}/api/CuentaCorriente/exportar-pdf/${clienteSeleccionado}?${params.toString()}`,
       "_blank"
     );
   };
@@ -178,7 +177,7 @@ const mostrarToast = (message, variant = "success") => {
       };
 
       const res = await fetch(
-        `${baseUrl}/CuentaCorriente/pagar-parcial/${clienteSeleccionado}`,
+        `${import.meta.env.VITE_API_URL}/api/CuentaCorriente/pagar-parcial/${clienteSeleccionado}`,
         {
           method: "POST",
           headers,
