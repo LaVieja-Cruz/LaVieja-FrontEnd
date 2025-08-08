@@ -1,8 +1,8 @@
-const API_URL = `${import.meta.env.VITE_API_URL}/api`; // <-- PONER EL PUERTO DE CADA UNO DEL BACK
+
 
 export const authenticateUser = async (email, password) => {
   try {
-    const response = await fetch(`${API_URL}/Authenticate/authenticate`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/Authenticate/authenticate`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
