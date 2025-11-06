@@ -111,7 +111,7 @@ const Pedidos = () => {
 
     // 1. Obtener clientes normales
     const resClientes = await fetch(
-      `${import.meta.env.VITE_API_URL}api/Client/GetAll`,
+      `${import.meta.env.VITE_API_URL}/api/Client/GetAll`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
