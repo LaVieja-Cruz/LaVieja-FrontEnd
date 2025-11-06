@@ -43,7 +43,7 @@ useEffect(() => {
 
   const marcarDetalleComoListo = async (idDetalle) => {
     try {
-      await axios.put(`${import.meta.env.VITE_API_URL}/api/marcar-detalle-listo}/${idDetalle}`, null, {
+      await axios.put(`${import.meta.env.VITE_API_URL}/api/Pedido/marcar-detalle-listo/${idDetalle}`, null, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
         },
